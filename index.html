@@ -110,9 +110,10 @@
 
             // Изменение цвета всех путей в SVG
             svgElement.querySelectorAll('path').forEach(path => path.setAttribute('fill', '#181411'));
-
+            // bg-[#000]
             sectionElement.innerHTML = `
-              <div class="text-[#181411] flex items-center justify-center rounded-lg bg-[#fff] shrink-0 size-12 icon-container">
+              <div class="text-[#181411] flex items-center justify-center rounded-lg  shrink-0 size-12 icon-container" style="background: rgb(255,252,0);
+background: linear-gradient(45deg, rgba(255,252,0,1) 0%, rgba(219,181,24,1) 35%, rgba(255,226,0,1) 100%);">
                 ${svgElement.innerHTML}
               </div>
               <div class="flex flex-col justify-center">
