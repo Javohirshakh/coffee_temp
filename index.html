@@ -21,6 +21,30 @@
       .section-content .text-sm {
         font-size: 0.7rem; /* Уменьшение размера текста на 20% */
       }
+      .wrapper {
+        display: flex;
+      }
+      #sections {
+        width: 60%;
+      }
+      #personalList {
+        width: 40%;
+      }
+      .icon-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        margin-right: 1rem;
+        background: rgb(255,175,0);
+background: linear-gradient(45deg, rgba(255,175,0,1) 0%, rgba(255,255,0,1) 35%, rgba(255,201,0,1) 100%); /* Градиентный фон */
+        border-radius: 50%; /* Круглый фон */
+      }
+      .icon-container img {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
     </style>
   </head>
   <body>
@@ -47,9 +71,12 @@
               <p id="month" class="text-[#887263] text-sm font-normal leading-normal">Iyul</p>
             </div>
             <h3 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 animate__animated animate__fadeIn animate__delay-2s">Bo'limlar</h3>
-            <div id="sections" class="animate__animated animate__fadeIn animate__delay-3s"></div>
+            <div class="wrapper">
+                <div id="sections" class="grid grid-cols-2 gap-4 animate__animated animate__fadeIn animate__delay-3s"></div>
+                <div id="personalList">Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit maxime ratione quaerat tenetur repellat praesentium sit ullam, a obcaecati nemo ipsam aspernatur consectetur eveniet, deserunt expedita earum, ab illum dignissimos.</div>
+            </div>
             <div class="flex gap-6 justify-between animate__animated animate__fadeIn animate__delay-4s">
-              <p id="total_collected" class="text-[#181411] text-base p-4 font-medium leading-normal">Bizda jarima emas, shunchaki coffeeni yaxshi ko'ramiz :)</p>
+              <p id="total_collected" class="text-[#181411] text-base p-4 font-medium leading-normal">Bizda jarima emas, shunchaki coffeeni yaxshi ко'рамиз :)</p>
             </div>
           </div>
         </div>
@@ -72,6 +99,8 @@
 
           const budget = 1500000; // Установите ваш бюджет
           let collected = 0;
+
+          data = data.filter(section => section.amount > 0); // Фильтрация отделов с нулевой суммой
 
           data.forEach(section => {
             if (section.department !== "ИТОГ") {
@@ -99,6 +128,9 @@
               sectionElement.classList.add('flex', 'items-center', 'gap-1', 'bg-white', 'min-h-[60px]', 'section-content', 'animate__animated', 'animate__fadeInUp', 'animate__delay-1s');
               
               sectionElement.innerHTML = `
+                <div class="icon-container">
+                  <img src="${section.icon}" alt="${section.department} icon">
+                </div>
                 <div class="flex flex-col justify-center">
                   <p class="text-[#181411] text-base font-medium leading-normal line-clamp-1">Ulush: ${section.amount.toLocaleString()}</p>
                   <p class="text-[#887263] text-sm font-normal leading-normal line-clamp-2">${section.department}</p>
