@@ -102,7 +102,7 @@
           const sectionsContainer = document.getElementById('sections');
           for (const section of data.sections) {
             const sectionElement = document.createElement('div');
-            sectionElement.classList.add('flex', 'items-center', 'gap-2', 'bg-white', 'px-4', 'min-h-[72px]', 'py-2', 'section-content', 'animate__animated', 'animate__fadeInUp', 'animate__delay-1s');
+            sectionElement.classList.add('flex', 'items-center', 'gap-1', 'bg-white', 'min-h-[60px]', 'section-content', 'animate__animated', 'animate__fadeInUp', 'animate__delay-1s');
 
             const svgContent = await fetchSVG(section.icon);
             const svgElement = document.createElement('div');
