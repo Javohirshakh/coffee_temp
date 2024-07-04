@@ -3,41 +3,40 @@
     "sections": [
       {
         "amount": 40000,
-        "department": "HR bo'limi"
+        "department": "HR bo'limi",
+        "icon": "icons/hr.svg"
       },
       {
         "amount": 40000,
-        "department": "Moliya bo'limi"
+        "department": "Moliya bo'limi",
+        "icon": "icons/finance.svg"
       },
       {
         "amount": 50000,
-        "department": "Call-center"
+        "department": "Call-center",
+        "icon": "icons/call-center.svg"
       },
       {
         "amount": 30000,
-        "department": "Sifat nazorati bo'limi"
+        "department": "Sifat nazorati bo'limi",
+        "icon": "icons/quality-control.svg"
       },
       {
         "amount": 10000,
-        "department": "Kuryerlik xizmati"
+        "department": "Kuryerlik xizmati",
+        "icon": "icons/delivery.svg"
       },
       {
         "amount": 40000,
-        "department": "Marketing"
+        "department": "Marketing",
+        "icon": "icons/marketing.svg"
       },
       {
         "amount": 50000,
-        "department": "Buxgalteriya"
-      },
-      {
-        "amount": 20000,
-        "department": "Xavfsizlik xizmati bo'limi"
-      },
-      {
-        "amount": 10000,
-        "department": "Franshiza"
+        "department": "Buxgalteriya",
+        "icon": "icons/accounting.svg"
       }
     ],
-    "month": "Iyul"
+    "month": "iyul"
   }
   

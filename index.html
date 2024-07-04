@@ -13,6 +13,11 @@
     <title>Apexpizza</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+      .icon path {
+        fill: #181411; /* Цвет Tomato */
+      }
+    </style>
   </head>
   <body>
     <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;'>
@@ -23,7 +28,7 @@
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"
-                  fill="currentColor"
+                  fill="#181411"
                 ></path>
               </svg>
             </div>
@@ -55,9 +60,14 @@
       </div>
     </div>
     <script>
+      async function fetchSVG(url) {
+        const response = await fetch(url);
+        return await response.text();
+      }
+
       fetch('data.json')
         .then(response => response.json())
-        .then(data => {
+        .then(async data => {
           const budget = parseInt(data.budget.replace(/\s+/g, ''));
           let collected = 0;
 
@@ -76,14 +86,20 @@
           document.getElementById('total_collected').innerText = `Bizda jarima emas, shunchaki coffeeni yaxshi ko'ramiz :)`;
 
           const sectionsContainer = document.getElementById('sections');
-          data.sections.forEach(section => {
+          for (const section of data.sections) {
             const sectionElement = document.createElement('div');
             sectionElement.classList.add('flex', 'items-center', 'gap-4', 'bg-white', 'px-4', 'min-h-[72px]', 'py-2');
+
+            const svgContent = await fetchSVG(section.icon);
+            const svgElement = document.createElement('div');
+            svgElement.innerHTML = svgContent;
+
+            // Изменение цвета всех путей в SVG
+            svgElement.querySelectorAll('path').forEach(path => path.setAttribute('fill', '#181411'));
+
             sectionElement.innerHTML = `
-              <div class="text-[#181411] flex items-center justify-center rounded-lg bg-[#f4f2f0] shrink-0 size-12" data-icon="ArrowRight" data-size="24px" data-weight="regular">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
-                  <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
-                </svg>
+              <div class="text-[#181411] flex items-center justify-center rounded-lg bg-[#fff] shrink-0 size-12 icon-container">
+                ${svgElement.innerHTML}
               </div>
               <div class="flex flex-col justify-center">
                 <p class="text-[#181411] text-base font-medium leading-normal line-clamp-1">Ulush: ${section.amount.toLocaleString()}</p>
@@ -91,7 +107,7 @@
               </div>
             `;
             sectionsContainer.appendChild(sectionElement);
-          });
+          }
         });
     </script>
   </body>
