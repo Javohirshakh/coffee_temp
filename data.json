@@ -1,0 +1,43 @@
+{
+    "budget": "1 500 000",
+    "sections": [
+      {
+        "amount": 40000,
+        "department": "HR bo'limi"
+      },
+      {
+        "amount": 40000,
+        "department": "Moliya bo'limi"
+      },
+      {
+        "amount": 50000,
+        "department": "Call-center"
+      },
+      {
+        "amount": 30000,
+        "department": "Sifat nazorati bo'limi"
+      },
+      {
+        "amount": 10000,
+        "department": "Kuryerlik xizmati"
+      },
+      {
+        "amount": 40000,
+        "department": "Marketing"
+      },
+      {
+        "amount": 50000,
+        "department": "Buxgalteriya"
+      },
+      {
+        "amount": 20000,
+        "department": "Xavfsizlik xizmati bo'limi"
+      },
+      {
+        "amount": 10000,
+        "department": "Franshiza"
+      }
+    ],
+    "month": "Iyul"
+  }
+  

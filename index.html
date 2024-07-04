@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Be+Vietnam+Pro%3Awght%40400%3B500%3B700%3B900"
+    />
+    <title>Apexpizza</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;'>
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
+          <div class="flex items-center gap-4 text-[#181411]">
+            <div class="size-4">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </div>
+            <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">Apexpizza Coffee yig'imi</h2>
+          </div>
+        </header>
+        <div class="px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+            <div class="flex flex-wrap justify-between gap-3 p-4">
+              <p id="budget" class="text-[#181411] text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Coffee budjeti: 1 500 000</p>
+            </div>
+            <div class="flex flex-col gap-3 p-4">
+              <div class="flex gap-6 justify-between">
+                <p id="collected" class="text-[#181411] text-base font-medium leading-normal">290 000 yig'ildi</p>
+                <p id="remaining" class="text-[#181411] text-base font-medium leading-normal"></p>
+              </div>
+              <div class="rounded bg-[#e5dfdc]">
+                <div id="progress" class="h-2 rounded bg-[#181411]" style="width: 40%;"></div>
+              </div>
+              <p id="month" class="text-[#887263] text-sm font-normal leading-normal">Iyul</p>
+            </div>
+            <h3 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Bo'limlar</h3>
+            <div id="sections"></div>
+            <div class="flex gap-6 justify-between">
+              <p id="total_collected" class="text-[#181411] text-base font-medium leading-normal">Bizda jarima emas, shunchaki coffeeni yaxshi ko'ramiz :)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      fetch('data.json')
+        .then(response => response.json())
+        .then(data => {
+          const budget = parseInt(data.budget.replace(/\s+/g, ''));
+          let collected = 0;
+
+          data.sections.forEach(section => {
+            collected += section.amount;
+          });
+
+          const progress = (collected / budget) * 100;
+          const remaining = budget - collected;
+
+          document.getElementById('budget').innerText = `Coffee budjeti: ${data.budget}`;
+          document.getElementById('collected').innerText = `${collected.toLocaleString()} yig'ildi`;
+          document.getElementById('progress').style.width = `${progress}%`;
+          document.getElementById('month').innerText = data.month;
+          document.getElementById('remaining').innerText = `Bossda qolgan summa: ${remaining.toLocaleString()}`;
+          document.getElementById('total_collected').innerText = `Bizda jarima emas, shunchaki coffeeni yaxshi ko'ramiz :)`;
+
+          const sectionsContainer = document.getElementById('sections');
+          data.sections.forEach(section => {
+            const sectionElement = document.createElement('div');
+            sectionElement.classList.add('flex', 'items-center', 'gap-4', 'bg-white', 'px-4', 'min-h-[72px]', 'py-2');
+            sectionElement.innerHTML = `
+              <div class="text-[#181411] flex items-center justify-center rounded-lg bg-[#f4f2f0] shrink-0 size-12" data-icon="ArrowRight" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"></path>
+                </svg>
+              </div>
+              <div class="flex flex-col justify-center">
+                <p class="text-[#181411] text-base font-medium leading-normal line-clamp-1">Ulush: ${section.amount.toLocaleString()}</p>
+                <p class="text-[#887263] text-sm font-normal leading-normal line-clamp-2">${section.department}</p>
+              </div>
+            `;
+            sectionsContainer.appendChild(sectionElement);
+          });
+        });
+    </script>
+  </body>
+</html>
