@@ -15,18 +15,11 @@
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
-      .icon path {
-        fill: #181411; /* Цвет Tomato */
-      }
       .section-content .text-base {
         font-size: 0.875rem; /* Уменьшение размера текста на 20% */
       }
       .section-content .text-sm {
         font-size: 0.7rem; /* Уменьшение размера текста на 20% */
-      }
-      .icon-container svg {
-        width: 1.5rem; /* 20% меньше стандартного размера */
-        height: 1.5rem; /* 20% меньше стандартного размера */
       }
     </style>
   </head>
@@ -35,14 +28,6 @@
       <div class="layout-container flex h-full grow flex-col">
         <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
           <div class="flex items-center gap-4 text-[#181411]">
-            <div class="size-4">
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="animate__animated animate__pulse">
-                <path
-                  d="M4 42.4379C4 42.4379 14.0962 36.0744 24 41.1692C35.0664 46.8624 44 42.2078 44 42.2078L44 7.01134C44 7.01134 35.068 11.6577 24.0031 5.96913C14.0971 0.876274 4 7.27094 4 7.27094L4 42.4379Z"
-                  fill="#181411"
-                ></path>
-              </svg>
-            </div>
             <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza Coffee yig'imi</h2>
           </div>
         </header>
@@ -56,7 +41,7 @@
                 <p id="collected" class="text-[#181411] text-base font-medium leading-normal">290 000 yig'ildi</p>
                 <p id="remaining" class="text-[#181411] text-base font-medium leading-normal"></p>
               </div>
-              <div class="rounded bg-[#e5dfdc] ">
+              <div class="rounded bg-[#e5dfdc]">
                 <div id="progress" class="h-2 rounded bg-[#181411]" style="width: 40%;"></div>
               </div>
               <p id="month" class="text-[#887263] text-sm font-normal leading-normal">Iyul</p>
@@ -71,58 +56,60 @@
       </div>
     </div>
     <script>
-      async function fetchSVG(url) {
+      async function fetchGoogleSheetData(url) {
         const response = await fetch(url);
-        return await response.text();
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return await response.json();
       }
 
-      fetch('data.json')
-        .then(response => response.json())
+      const googleSheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=GNeh0xbaKjCcSfKTH23nvocD6QFLqJqZAjU-JmDTCeqgGaKrx-bV_gdPFosyCaOi5JhOuX-3J0B4ZhJxIAsUmjAO31AccWfom5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnPUxTgVi1APz0VKbSVgf0-45OXfC-mt1XTs0wtnt9bDCF9AgjHtgnwPUW5-rY9ayp55zOwqhVUjCwF6xwQBPqSQla2ZX9DS17w&lib=MO__Nwa4xWfJmUFM5DPS0T-K7kHi6djVF';
+
+      fetchGoogleSheetData(googleSheetUrl)
         .then(async data => {
-          const budget = parseInt(data.budget.replace(/\s+/g, ''));
+          console.log('Data from Google Sheets:', data); // Debug: log data
+
+          const budget = 1500000; // Установите ваш бюджет
           let collected = 0;
 
-          data.sections.forEach(section => {
-            collected += section.amount;
+          data.forEach(section => {
+            if (section.department !== "ИТОГ") {
+              collected += section.amount;
+            }
           });
 
           const progress = (collected / budget) * 100;
           const remaining = budget - collected;
 
-          document.getElementById('budget').innerText = `Coffee budjeti: ${data.budget}`;
+          document.getElementById('budget').innerText = `Coffee budjeti: ${budget.toLocaleString()}`;
           document.getElementById('collected').innerText = `${collected.toLocaleString()} yig'ildi`;
           document.getElementById('progress').style.width = `${progress}%`;
-          document.getElementById('month').innerText = data.month;
+          document.getElementById('month').innerText = 'Iyul';
           document.getElementById('remaining').innerText = `Bossda qolgan summa: ${remaining.toLocaleString()}`;
-          document.getElementById('total_collected').innerText = `Bizda jarima emas, shunchaki coffeeni yaxshi ko'ramiz :)`;
+          document.getElementById('total_collected').innerText = `Bizda jarima emas, shunchaki coffeeni yaxshi ко'рамиз :)`;
 
           // Сортировка секций по убыванию суммы
-          data.sections.sort((a, b) => b.amount - a.amount);
+          data.sort((a, b) => b.amount - a.amount);
 
           const sectionsContainer = document.getElementById('sections');
-          for (const section of data.sections) {
-            const sectionElement = document.createElement('div');
-            sectionElement.classList.add('flex', 'items-center', 'gap-1', 'bg-white', 'min-h-[60px]', 'section-content', 'animate__animated', 'animate__fadeInUp', 'animate__delay-1s');
-
-            const svgContent = await fetchSVG(section.icon);
-            const svgElement = document.createElement('div');
-            svgElement.innerHTML = svgContent;
-
-            // Изменение цвета всех путей в SVG
-            svgElement.querySelectorAll('path').forEach(path => path.setAttribute('fill', '#181411'));
-            // bg-[#000]
-            sectionElement.innerHTML = `
-              <div class="text-[#181411] flex items-center justify-center rounded-lg  shrink-0 size-12 icon-container" style="background: rgb(255,175,0);
-background: linear-gradient(45deg, rgba(255,175,0,1) 0%, rgba(255,255,0,1) 35%, rgba(255,201,0,1) 100%);">
-                ${svgElement.innerHTML}
-              </div>
-              <div class="flex flex-col justify-center">
-                <p class="text-[#181411] text-base font-medium leading-normal line-clamp-1">Ulush: ${section.amount.toLocaleString()}</p>
-                <p class="text-[#887263] text-sm font-normal leading-normal line-clamp-2">${section.department}</p>
-              </div>
-            `;
-            sectionsContainer.appendChild(sectionElement);
-          }
+          data.forEach(section => {
+            if (section.department !== "ИТОГ") {
+              const sectionElement = document.createElement('div');
+              sectionElement.classList.add('flex', 'items-center', 'gap-1', 'bg-white', 'min-h-[60px]', 'section-content', 'animate__animated', 'animate__fadeInUp', 'animate__delay-1s');
+              
+              sectionElement.innerHTML = `
+                <div class="flex flex-col justify-center">
+                  <p class="text-[#181411] text-base font-medium leading-normal line-clamp-1">Ulush: ${section.amount.toLocaleString()}</p>
+                  <p class="text-[#887263] text-sm font-normal leading-normal line-clamp-2">${section.department}</p>
+                </div>
+              `;
+              sectionsContainer.appendChild(sectionElement);
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
         });
     </script>
   </body>
