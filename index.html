@@ -23,15 +23,19 @@
       }
       .wrapper {
         display: flex;
+        align-items: flex-start;
       }
-      #sections {
+      .sections {
         width: 60%;
       }
-      #personalList {
+      #sections {
+        width: 100%;
+      }
+      .personalList {
         width: 40%;
         padding: 1rem;
-        background-color: #f9f9f9;
-        border-left: 1px solid #ddd;
+      }
+      #personalList {
       }
       .icon-container {
         display: flex;
@@ -41,12 +45,36 @@
         height: 3rem;
         margin-right: 1rem;
         background: rgb(255,175,0);
-        background: linear-gradient(45deg, rgba(255,175,0,1) 0%, rgba(255,255,0,1) 35%, rgba(255,201,0,1) 100%); /* Градиентный фон */
-        border-radius: 50%; /* Круглый фон */
+        background: linear-gradient(45deg, rgba(255,175,0,1) 0%, rgba(255,255,0,1) 35%, rgba(255,201,0,1) 100%);
+        border-radius: 50%;
       }
       .icon-container img {
         width: 1.5rem;
         height: 1.5rem;
+      }
+      .person-card {
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .person-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .person-card p {
+        margin: 0.2rem 0;
+      }
+      .person-name {
+        font-weight: bold;
+        color: #181411;
+      }
+      .person-amount {
+        color: #887263;
       }
     </style>
   </head>
@@ -58,8 +86,8 @@
             <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza Coffee yig'imi</h2>
           </div>
         </header>
-        <div class="px-40 flex flex-1 justify-center py-1">
-          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+        <div class="px-20 flex flex-1 justify-center py-1">
+          <div class="layout-content-container flex flex-col max-w-[1100px] flex-1">
             <div class="flex flex-wrap justify-between gap-1 p-1 animate__animated animate__fadeIn">
               <p id="budget" class="text-[#181411] text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Coffee budjeti: 1 500 000</p>
             </div>
@@ -71,19 +99,30 @@
               <div class="rounded bg-[#e5dfdc]">
                 <div id="progress" class="h-2 rounded bg-[#181411]" style="width: 40%;"></div>
               </div>
-              <p id="month" class="text-[#887263] text-sm font-normal leading-normal">Iyul</p>
+              <p id="month" class="text-[#887263] text-sm font-normal leading-normal"></p>
             </div>
-            <h3 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 animate__animated animate__fadeIn animate__delay-2s">Bo'limlar</h3>
             <div class="wrapper">
+              <div class="sections">
+                <h3 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 animate__animated animate__fadeIn animate__delay-2s">Bo'limlar</h3>
                 <div id="sections" class="grid grid-cols-2 gap-4 animate__animated animate__fadeIn animate__delay-3s"></div>
-                <div id="personalList">Loading...</div>
-            </div>
-            <div class="flex gap-6 justify-between animate__animated animate__fadeIn animate__delay-4s">
-              <p id="total_collected" class="text-[#181411] text-base p-4 font-medium leading-normal">Bizda jarima emas, shunchaki coffeeni yaxshi ко'рамиз :)</p>
+                <div class="flex gap-6 justify-between animate__animated animate__fadeIn animate__delay-4s py-4">
+                  <p id="total_collected" class="text-[#181411] text-base p-4 font-medium leading-normal">Bizda jarima emas, shunchaki coffeeni <br><br><br> yaxshi ко'рамиз :)</p>
+                </div>
+              </div>
+              <div class="personalList">
+
+            <h3 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4 animate__animated animate__fadeIn animate__delay-2s">Rekordsmenlar</h3>
+            <div id="personalList">Loading...</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <footer class="flex items-center justify-center whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-12">
+        <div class="flex items-center gap-4 text-[#181411]">
+          <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza <3 </h2>
+        </div>
+      </footer>
     </div>
     <script>
       async function fetchGoogleSheetData(url) {
@@ -96,6 +135,12 @@
 
       const googleSheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=GNeh0xbaKjCcSfKTH23nvocD6QFLqJqZAjU-JmDTCeqgGaKrx-bV_gdPFosyCaOi5JhOuX-3J0B4ZhJxIAsUmjAO31AccWfom5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnPUxTgVi1APz0VKbSVgf0-45OXfC-mt1XTs0wtnt9bDCF9AgjHtgnwPUW5-rY9ayp55zOwqhVUjCwF6xwQBPqSQla2ZX9DS17w&lib=MO__Nwa4xWfJmUFM5DPS0T-K7kHi6djVF';
       const googlePeopleUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=-NpKx5mF0MADlHKho0ts23aY47ZmU_kVYKFI3JmgqcYgIIrWbdKyRMTrHZBpbw6xd1NemN1FDo2zi0Nzcy1Dub5U2PIpERPKm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnJPKDawKjtQxqLqjZigTSSjlkoBrj3Hfq_tEV2AbLWXhSLEFqQqF0IuBXGc4CBQUv2Xgzaatbkpw-vBf6gnJGCU6VEGkC-o5Kw&lib=MO__Nwa4xWfJmUFM5DPS0T-K7kHi6djVF';
+
+      function getCurrentMonthUzbek() {
+        const date = new Date();
+        const options = { month: 'long' };
+        return new Intl.DateTimeFormat('uz-UZ', options).format(date);
+      }
 
       fetchGoogleSheetData(googleSheetUrl)
         .then(async data => {
@@ -118,7 +163,7 @@
           document.getElementById('budget').innerText = `Coffee budjeti: ${budget.toLocaleString()}`;
           document.getElementById('collected').innerText = `${collected.toLocaleString()} yig'ildi`;
           document.getElementById('progress').style.width = `${progress}%`;
-          document.getElementById('month').innerText = 'Iyul';
+          document.getElementById('month').innerText = getCurrentMonthUzbek();
           document.getElementById('remaining').innerText = `Bossda qolgan summa: ${remaining.toLocaleString()}`;
           document.getElementById('total_collected').innerText = `Bizda jarima emas, shunchaki coffeeni yaxshi ко'рамиз :)`;
 
@@ -129,7 +174,7 @@
           data.forEach(section => {
             if (section.department !== "ИТОГ") {
               const sectionElement = document.createElement('div');
-              sectionElement.classList.add('flex', 'items-center', 'gap-1', 'bg-white', 'min-h-[60px]', 'section-content', 'animate__animated', 'animate__fadeInUp', 'animate__delay-1s');
+              sectionElement.classList.add('flex', 'items-center', 'gap-1', 'bg-white', 'h-[60px]', 'section-content', 'animate__animated', 'animate__fadeInUp', 'animate__delay-1s');
               
               sectionElement.innerHTML = `
                 <div class="icon-container">
@@ -156,11 +201,11 @@
               peopleData.forEach(person => {
                 if (person.amount > 0) {
                   const personElement = document.createElement('div');
-                  personElement.classList.add('flex', 'flex-col', 'mb-2');
+                  personElement.classList.add('person-card');
                   
                   personElement.innerHTML = `
-                    <p class="text-[#181411] text-base font-medium leading-normal">${person.fullName}</p>
-                    <p class="text-[#887263] text-sm font-normal">${person.amount.toLocaleString()} сум</p>
+                    <p class="person-name">${person.fullName}</p>
+                    <p class="person-amount">${person.amount.toLocaleString()} so'm</p>
                   `;
                   personalListContainer.appendChild(personElement);
                 }
