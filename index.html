@@ -95,6 +95,9 @@
           document.getElementById('remaining').innerText = `Bossda qolgan summa: ${remaining.toLocaleString()}`;
           document.getElementById('total_collected').innerText = `Bizda jarima emas, shunchaki coffeeni yaxshi ko'ramiz :)`;
 
+          // Сортировка секций по убыванию суммы
+          data.sections.sort((a, b) => b.amount - a.amount);
+
           const sectionsContainer = document.getElementById('sections');
           for (const section of data.sections) {
             const sectionElement = document.createElement('div');
