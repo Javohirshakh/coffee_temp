@@ -1,3 +1,27 @@
+body {
+    padding-top: 168px;
+}
+header {
+    width: 100%;
+    top: 0;
+    position: fixed;
+    background-color: #fff;
+    z-index: 99999;
+}
+.header-fixed {
+    top: 48px;
+    position: fixed;
+    z-index: 99999;
+    background-color: #fff;
+    width: 1100px;
+}
+.progress-fixed {
+    position: fixed;
+    top: 100px;
+    width: 1100px;
+    background-color: #fff;
+    z-index: 99999;
+}
 .section-content .text-base {
     font-size: 0.875rem; /* Уменьшение размера текста на 20% */
 }
@@ -5,11 +29,20 @@
     font-size: 0.7rem; /* Уменьшение размера текста на 20% */
 }
 .wrapper {
+    width: 100%!important;
     display: flex;
     align-items: flex-start;
+    position: relative;
+    justify-content: flex-end;
 }
 .sections {
-    width: 55%;
+    margin: 0 auto;
+    position: fixed;
+    width: 605px;
+}
+.sections-fixed {
+    left: 0;
+    width: 600px;
 }
 #sections {
     width: 100%;
@@ -163,4 +196,36 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+@keyframes arrow-pulse-reverse {
+    0%,
+    100% {
+        transform: translateY(5px) rotate(-90deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(-90deg);
+    }
+}
+
+.person-card:nth-child(1) .person-name::after {
+    content: '➔';
+    animation: arrow-pulse-reverse 1.5s infinite;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.person-card:nth-child(2) .person-name::after {
+    content: '➔';
+    animation: arrow-pulse-reverse 1.5s infinite;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.person-card:nth-child(3) .person-name::after {
+    content: '➔';
+    animation: arrow-pulse-reverse 1.5s infinite;
+    display: inline-block;
+    margin-left: 5px;
+    animation-delay: 0.5s;
 }
