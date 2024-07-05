@@ -54,7 +54,13 @@ header {
     width: 100%;
 }
 .record-fix {
+    padding-top: 20px;
+    transform: translateY(-20px) translateX(-5px);
+    z-index: 99999;
     position: fixed;
+    background-color: #fff;
+    display: block;
+    width: 470px;
 }
 .personalList {
     width: 45%;
