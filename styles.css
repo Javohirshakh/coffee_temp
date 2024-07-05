@@ -19,7 +19,7 @@ header {
     background-color: #fff;
     width: 1100px;
     padding-top: 10px;
-    pb5px
+    padding-bottom: 5px;
 }
 .progress-fixed {
     position: fixed;
