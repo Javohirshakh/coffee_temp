@@ -13,15 +13,16 @@ header {
     height: 40px;
 }
 .header-fixed {
-    top: 48px;
+    top: 65px;
     position: fixed;
     z-index: 99999;
     background-color: #fff;
     width: 1100px;
+    padding-top: 10px;
 }
 .progress-fixed {
     position: fixed;
-    top: 100px;
+    top: 120px;
     width: 1100px;
     background-color: #fff;
     z-index: 99999;
@@ -33,6 +34,7 @@ header {
     font-size: 0.7rem; /* Уменьшение размера текста на 20% */
 }
 .wrapper {
+    margin-top: 20px;
     width: 100%!important;
     display: flex;
     align-items: flex-start;
@@ -51,11 +53,15 @@ header {
 #sections {
     width: 100%;
 }
+.record-fix {
+    position: fixed;
+}
 .personalList {
     width: 45%;
     padding: 1rem;
 }
 #personalList {
+    padding-top: 28px;
 }
 .icon-container {
     display: flex;
