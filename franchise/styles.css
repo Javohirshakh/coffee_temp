@@ -88,13 +88,13 @@ header {
     min-width: 150px;
 }
 .card-title {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 500;
     color: #111827;
     margin-bottom: 10px;
 }
 .card-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #1f2937;
 }
