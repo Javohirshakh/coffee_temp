@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Be+Vietnam+Pro%3Awght%40400%3B500%3B700%3B900"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="styles.css" />
+    <title>Apexpizza Franchise ADS reports</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+<body>
+    <div class="loader">
+      <div class="spinner"></div>
+    </div>
+    <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden animate__animated animate__fadeIn" style='font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;'>
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
+          <div class="flex items-center gap-4 text-[#181411]">
+            <img src="../images/logo.png" alt="логотип" class="logo">
+            <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza Franchise ADS reports</h2>
+          </div>
+        </header>
+        <div class="px-20 flex flex-1 justify-center py-1">
+          <div class="layout-content-container flex flex-col max-w-[1400px] flex-1">
+            <div class="flex flex-wrap justify-between gap-1 p-1 animate__animated animate__fadeIn">
+              <p id="chartTitle" class="text-[#181411] text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">ADS reports</p>
+            </div>
+            <div class="cards-container flex justify-between gap-4 p-2 animate__animated animate__fadeIn">
+              <div class="card">
+                <p class="card-title">Просмотры</p>
+                <p class="card-value" id="finalViews"></p>
+              </div>
+              <div class="card">
+                <p class="card-title">Потрачено</p>
+                <p class="card-value" id="finalSpent"></p>
+              </div>
+              <div class="card">
+                <p class="card-title">Заявки</p>
+                <p class="card-value" id="finalReqs"></p>
+              </div>
+              <div class="card">
+                <p class="card-title">Средняя цена заявки</p>
+                <p class="card-value" id="finalAvaragePriceOfReq"></p>
+              </div>
+              <div class="card">
+                <p class="card-title">Количество встреч</p>
+                <p class="card-value" id="finalNumOfMeets"></p>
+              </div>
+              <div class="card">
+                <p class="card-title">Средняя стоимость встречи</p>
+                <p class="card-value" id="finalAvaragePriceOfMeets"></p>
+              </div>
+            </div>
+            <div class="flex flex-col p-2 animate__animated animate__fadeIn animate__delay-1s">
+              <canvas id="chart1" class="mb-4"></canvas>
+              <canvas id="chart2" class="chart-small"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="flex items-center justify-center whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-12">
+        <div class="flex items-center gap-4 text-[#181411]">
+          <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza <3 </h2>
+        </div>
+      </footer>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

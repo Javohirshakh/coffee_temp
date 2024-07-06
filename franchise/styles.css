@@ -1,0 +1,100 @@
+body {
+    padding-top: 80px;
+}
+header {
+    width: 100%;
+    top: 0;
+    position: fixed;
+    background-color: #fff;
+    z-index: 99999;
+}
+.logo {
+    width: 40px;
+    height: 40px;
+}
+.header-fixed {
+    top: 65px;
+    position: fixed;
+    z-index: 99999;
+    background-color: #fff;
+    width: 1100px;
+    padding-top: 10px!important;
+    padding-bottom: 5px!important;
+}
+.progress-fixed {
+    position: static;
+    width: 1100px;
+    background-color: #fff;
+    z-index: 99999;
+}
+.wrapper {
+    margin-top: 20px;
+    width: 100%!important;
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    justify-content: flex-end;
+}
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.loader .spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 0.4rem solid #f3f3f3;
+    border-top: 0.4rem solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+#chart1 {
+    max-height: 500px!important;
+}
+.chart-small {
+    max-height: 300px!important; /* Устанавливаем высоту для второго графика */
+    padding: 0 50px;
+}
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    text-align: center;
+    flex: 1 1 calc(16% - 20px); /* Responsive width */
+    min-width: 150px;
+}
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #111827;
+    margin-bottom: 10px;
+}
+.card-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+}
