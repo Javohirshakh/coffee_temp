@@ -30,7 +30,7 @@ async function createCharts() {
                 backgroundColor: '#66BB6A',
                 stack: 'Stack 1'
             }, {
-                label: 'Количество запросов',
+                label: 'Количество заявок',
                 data: data1.map(item => item.numOfRequests),
                 backgroundColor: '#FFA726',
                 stack: 'Stack 2'
