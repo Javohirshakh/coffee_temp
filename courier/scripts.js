@@ -1,234 +1,246 @@
 async function fetchGoogleSheetData(url) {
     const response = await fetch(url);
     if (!response.ok) {
-        console.error('Failed to fetch data from:', url);
         throw new Error('Network response was not ok ' + response.statusText);
     }
     return await response.json();
 }
 
-const dataUrl = 'https://script.google.com/macros/s/AKfycbwKBLizbuX30iCoyrby4lhOfUWRIFfdc3Xd63GaCViG2exJegVLqZ6yecdEKRFVQ32MSw/exec';
+const googleSheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=y17k_DfYaeAEc1HBpCRM9ffn7i_SejNO3H5VXQ1uQgJhutlX-Di2eCOZ9qak0oYTvspdbaD3Bmb8pCst5_U0TlBD0NXZaeBym5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnHJDQVpaATL4h5a76uZ7FkIY7uUjskcnAUDhdmEV5-ymh8qf9t_bYnezyJKcnV3HuEXArVX0mpvP9niIksjnwrgCgbe6w284t9z9Jw9Md8uu&lib=MxCcr65cCiDZFciAQak0wvD5qD2GCOdkK';
 
-let chart1, chart2, allData, uniqueBranches;
+let currentFilter = 'attendance';
+let data = [];
+let branchChart;
 
-async function createCharts() {
-    document.querySelector('.loader').style.display = 'flex';
+async function updateData(startDate, endDate) {
     try {
-        allData = await fetchGoogleSheetData(dataUrl);
-        uniqueBranches = [...new Set(allData.map(item => item.branch))];
+        data = await fetchGoogleSheetData(googleSheetUrl);
+        console.log(data);
 
-        // Populate branch filter
-        const branchFilter = document.getElementById('branchFilter');
-        uniqueBranches.forEach(branch => {
-            const option = document.createElement('option');
-            option.value = branch;
-            option.textContent = branch;
-            branchFilter.appendChild(option);
+        // Filter data by selected date range
+        const filteredData = data.filter(record => {
+            const date = new Date(record.date);
+            return date >= startDate && date <= endDate;
         });
 
-        const ctx1 = document.getElementById('chart1').getContext('2d');
-        chart1 = new Chart(ctx1, {
+        // Data preparation for percentage chart
+        const branches = Array.from(new Set(filteredData.map(record => record.branch)));
+        const branchPercentages = branches.map(branch => {
+            const branchRecords = filteredData.filter(record => record.branch === branch);
+            const totalOnTime = branchRecords.reduce((sum, record) => sum + record.onTimeEmployees, 0);
+            const totalEmployees = branchRecords.reduce((sum, record) => sum + record.ironAttendance, 0);
+            return totalEmployees ? (totalOnTime / totalEmployees) * 100 : 0;
+        });
+
+        const sortedBranches = branches.map((branch, index) => ({
+            branch,
+            percentage: branchPercentages[index]
+        })).sort((a, b) => b.percentage - a.percentage);
+
+        const sortedBranchLabels = sortedBranches.map(item => item.branch);
+        const sortedBranchData = sortedBranches.map(item => item.percentage);
+
+        // Create percentage chart
+        new Chart(document.getElementById('percentageChart'), {
             type: 'bar',
             data: {
-                labels: [],
-                datasets: []
+                labels: sortedBranchLabels,
+                datasets: [{
+                    label: 'Percentage',
+                    data: sortedBranchData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
             },
             options: {
-                responsive: true,
-                plugins: {
-                    datalabels: {
-                        display: true,
-                        align: 'end',
-                        anchor: 'end',
-                        color: 'black',
-                        font: {
-                            weight: 'bold'
-                        },
-                        formatter: function(value) {
-                            return value.toLocaleString();
-                        }
-                    }
-                },
+                indexAxis: 'y',
                 scales: {
                     x: {
-                        display: true,
-                    },
-                    y: {
-                        display: true,
-                        grid: {
-                            drawOnChartArea: true,
-                        }
+                        beginAtZero: true
                     }
                 }
-            },
-            plugins: [ChartDataLabels]
+            }
         });
 
-        const ctx2 = document.getElementById('chart2').getContext('2d');
-        chart2 = new Chart(ctx2, {
-            type: 'horizontalBar',
+        // Data preparation for pie chart
+        const totalOnTime = filteredData.reduce((sum, record) => sum + record.onTimeEmployees, 0);
+        const totalLate = filteredData.reduce((sum, record) => sum + record.lateEmployees, 0);
+        const totalAbsent = filteredData.reduce((sum, record) => sum + record.absentEmployees, 0);
+
+        // Create pie chart
+        new Chart(document.getElementById('pieChart'), {
+            type: 'pie',
             data: {
-                labels: uniqueBranches,
+                labels: ['On Time', 'Late', 'Absent'],
                 datasets: [{
-                    label: 'Процент присутствия',
-                    data: uniqueBranches.map(branch => {
-                        const branchData = allData.filter(item => item.branch === branch);
-                        return (branchData.reduce((sum, item) => sum + item.branchPercentage, 0) / branchData.length) * 100;
-                    }),
-                    backgroundColor: uniqueBranches.map(branch => {
-                        const branchData = allData.filter(item => item.branch === branch);
-                        const branchPercentage = branchData.reduce((sum, item) => sum + item.branchPercentage, 0) / branchData.length;
-                        return branchPercentage > 0.6 ? '#66BB6A' : '#FFA726';
-                    }),
+                    data: [totalOnTime, totalLate, totalAbsent],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(255, 99, 132, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Data preparation for branch chart
+        const ironAttendance = branches.map(branch => {
+            const branchRecords = filteredData.filter(record => record.branch === branch);
+            return branchRecords.reduce((sum, record) => sum + record.ironAttendance, 0);
+        });
+        const factAttendance = branches.map(branch => {
+            const branchRecords = filteredData.filter(record => record.branch === branch);
+            return branchRecords.reduce((sum, record) => sum + record.factAttendance, 0);
+        });
+        const restingEmployee = branches.map(branch => {
+            const branchRecords = filteredData.filter(record => record.branch === branch);
+            return branchRecords.reduce((sum, record) => sum + record.restingEmployee, 0);
+        });
+
+        const onTimeEmployees = branches.map(branch => {
+            const branchRecords = filteredData.filter(record => record.branch === branch);
+            return branchRecords.reduce((sum, record) => sum + record.onTimeEmployees, 0);
+        });
+        const lateEmployees = branches.map(branch => {
+            const branchRecords = filteredData.filter(record => record.branch === branch);
+            return branchRecords.reduce((sum, record) => sum + record.lateEmployees, 0);
+        });
+        const absentEmployees = branches.map(branch => {
+            const branchRecords = filteredData.filter(record => record.branch === branch);
+            return branchRecords.reduce((sum, record) => sum + record.absentEmployees, 0);
+        });
+
+        // Create branch chart
+        const branchChartConfig = {
+            type: 'bar',
+            data: {
+                labels: branches,
+                datasets: [{
+                    label: 'Iron Attendance',
+                    data: ironAttendance,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Fact Attendance',
+                    data: factAttendance,
+                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Resting Employee',
+                    data: restingEmployee,
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    datalabels: {
-                        display: true,
-                        align: 'end',
-                        anchor: 'end',
-                        color: 'black',
-                        font: {
-                            weight: 'bold'
-                        },
-                        formatter: function(value) {
-                            return `${value.toFixed(2)}%`;
-                        }
-                    }
-                },
                 scales: {
                     x: {
-                        display: true,
-                    },
-                    y: {
-                        display: true,
-                        grid: {
-                            drawOnChartArea: true,
-                        }
+                        beginAtZero: true
                     }
                 }
-            },
-            plugins: [ChartDataLabels]
+            }
+        };
+
+        if (branchChart) {
+            branchChart.destroy();
+        }
+        branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
+
+        document.getElementById('attendanceFilter').addEventListener('click', () => {
+            if (currentFilter !== 'attendance') {
+                branchChart.destroy();
+                branchChartConfig.data.datasets = [{
+                    label: 'Iron Attendance',
+                    data: ironAttendance,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Fact Attendance',
+                    data: factAttendance,
+                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Resting Employee',
+                    data: restingEmployee,
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }];
+                currentFilter = 'attendance';
+                document.getElementById('attendanceFilter').classList.add('active');
+                document.getElementById('presenceFilter').classList.remove('active');
+                branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
+            }
+        });
+
+        document.getElementById('presenceFilter').addEventListener('click', () => {
+            if (currentFilter !== 'presence') {
+                branchChart.destroy();
+                branchChartConfig.data.datasets = [{
+                    label: 'On Time Employees',
+                    data: onTimeEmployees,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Late Employees',
+                    data: lateEmployees,
+                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Absent Employees',
+                    data: absentEmployees,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }];
+                currentFilter = 'presence';
+                document.getElementById('attendanceFilter').classList.remove('active');
+                document.getElementById('presenceFilter').classList.add('active');
+                branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
+            }
         });
 
         document.querySelector('.loader').style.display = 'none';
     } catch (error) {
-        console.error('Error creating charts:', error);
-        document.querySelector('.loader').style.display = 'none';
+        console.error('Error updating data:', error);
     }
 }
 
-function updateCharts() {
-    document.querySelector('.loader').style.display = 'flex';
-    const dateRange = document.getElementById('dateRange').value.split(' to ');
-    const filterType = document.getElementById('dataFilter').value;
-    const selectedBranch = document.getElementById('branchFilter').value;
-
-    const filteredData = allData.filter(item => {
-        const itemDate = new Date(item.date);
-        return itemDate >= new Date(dateRange[0]) && itemDate <= new Date(dateRange[1]);
+document.addEventListener('DOMContentLoaded', function () {
+    $('#daterange').daterangepicker({
+        opens: 'left'
+    }, function (start, end, label) {
+        updateData(start.toDate(), end.toDate());
     });
 
-    const branchFilteredData = selectedBranch === 'all' ? filteredData : filteredData.filter(item => item.branch === selectedBranch);
-    const uniqueDates = [...new Set(branchFilteredData.map(item => item.date.split('T')[0]))];
+    const initialStartDate = moment().subtract(29, 'days');
+    const initialEndDate = moment();
 
-    if (filterType === 'branch' && selectedBranch !== 'all') {
-        chart1.data.labels = uniqueDates;
-        chart1.data.datasets = [{
-            label: 'Железный график',
-            data: uniqueDates.map(date => {
-                const dateData = branchFilteredData.filter(item => item.date.split('T')[0] === date);
-                return dateData.reduce((sum, item) => sum + item.ironAttendance, 0);
-            }),
-            backgroundColor: '#42A5F5',
-        }, {
-            label: 'Фактическое присутствие',
-            data: uniqueDates.map(date => {
-                const dateData = branchFilteredData.filter(item => item.date.split('T')[0] === date);
-                return dateData.reduce((sum, item) => sum + item.factAttendance, 0);
-            }),
-            backgroundColor: '#66BB6A',
-        }, {
-            label: 'Отдыхающие сотрудники',
-            data: uniqueDates.map(date => {
-                const dateData = branchFilteredData.filter(item => item.date.split('T')[0] === date);
-                return dateData.reduce((sum, item) => sum + item.restingEmployee, 0);
-            }),
-            backgroundColor: '#FFA726',
-        }];
-    } else {
-        chart1.data.labels = uniqueBranches;
-        chart1.data.datasets = [{
-            label: 'Железный график',
-            data: uniqueBranches.map(branch => {
-                const branchData = branchFilteredData.filter(item => item.branch === branch);
-                return branchData.reduce((sum, item) => sum + item.ironAttendance, 0);
-            }),
-            backgroundColor: '#42A5F5',
-        }, {
-            label: 'Фактическое присутствие',
-            data: uniqueBranches.map(branch => {
-                const branchData = branchFilteredData.filter(item => item.branch === branch);
-                return branchData.reduce((sum, item) => sum + item.factAttendance, 0);
-            }),
-            backgroundColor: '#66BB6A',
-        }, {
-            label: 'Отдыхающие сотрудники',
-            data: uniqueBranches.map(branch => {
-                const branchData = branchFilteredData.filter(item => item.branch === branch);
-                return branchData.reduce((sum, item) => sum + item.restingEmployee, 0);
-            }),
-            backgroundColor: '#FFA726',
-        }];
-    }
+    $('#daterange').data('daterangepicker').setStartDate(initialStartDate);
+    $('#daterange').data('daterangepicker').setEndDate(initialEndDate);
 
-    chart1.update();
-
-    chart2.data.labels = uniqueBranches.sort((a, b) => {
-        const aData = branchFilteredData.filter(item => item.branch === a);
-        const bData = branchFilteredData.filter(item => item.branch === b);
-        const aPercentage = aData.reduce((sum, item) => sum + item.branchPercentage, 0) / aData.length;
-        const bPercentage = bData.reduce((sum, item) => sum + item.branchPercentage, 0) / bData.length;
-        return bPercentage - aPercentage;
-    });
-
-    chart2.data.datasets[0].data = uniqueBranches.map(branch => {
-        const branchData = branchFilteredData.filter(item => item.branch === branch);
-        return (branchData.reduce((sum, item) => sum + item.branchPercentage, 0) / branchData.length) * 100;
-    });
-
-    chart2.data.datasets[0].backgroundColor = uniqueBranches.map(branch => {
-        const branchData = branchFilteredData.filter(item => item.branch === branch);
-        const branchPercentage = branchData.reduce((sum, item) => sum + item.branchPercentage, 0) / branchData.length;
-        return branchPercentage > 0.6 ? '#66BB6A' : '#FFA726';
-    });
-
-    chart2.update();
-
-    document.querySelector('.loader').style.display = 'none';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    createCharts();
-    flatpickr("#dateRange", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        defaultDate: ["2024-07-01", "2024-07-10"],
-        onChange: updateCharts
-    });
-
-    document.getElementById('dataFilter').addEventListener('change', (event) => {
-        const branchFilterContainer = document.getElementById('branchFilterContainer');
-        if (event.target.value === 'branch') {
-            branchFilterContainer.style.display = 'block';
-        } else {
-            branchFilterContainer.style.display = 'none';
-            document.getElementById('branchFilter').value = 'all';
-        }
-        updateCharts();
-    });
-    document.getElementById('branchFilter').addEventListener('change', updateCharts);
+    updateData(initialStartDate.toDate(), initialEndDate.toDate());
+    setInterval(() => {
+        const start = $('#daterange').data('daterangepicker').startDate;
+        const end = $('#daterange').data('daterangepicker').endDate;
+        updateData(start.toDate(), end.toDate());
+    }, 60000);
 });

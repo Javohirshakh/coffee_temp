@@ -1,70 +1,49 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <link rel="stylesheet" href="styles.css" />
-    <title>Courier Attendance Reports</title>
-    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <title>Branch Attendance Statistics</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="scripts.js" defer></script>
 </head>
 <body>
     <div class="loader">
-      <div class="spinner"></div>
+        <div class="spinner"></div>
     </div>
-    <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden animate__animated animate__fadeIn" style='font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;'>
-      <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
-          <div class="flex items-center gap-4 text-[#181411]">
-            <img src="../images/logo.png" alt="логотип" class="logo">
-            <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Courier Attendance Reports</h2>
-          </div>
-        </header>
-        <div class="px-20 flex flex-1 justify-center py-1">
-          <div class="layout-content-container flex flex-col max-w-[1400px] flex-1">
-            <div class="flex flex-wrap justify-between gap-1 p-1 animate__animated animate__fadeIn">
-              <p id="chartTitle" class="text-[#181411] text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Attendance Reports</p>
-              <div>
-                <label for="dateRange">Выберите период:</label>
-                <input type="text" id="dateRange" name="dateRange">
-              </div>
-            </div>
-            <div class="flex flex-wrap justify-between gap-1 p-1 animate__animated animate__fadeIn">
-              <label for="dataFilter">Фильтр данных:</label>
-              <select id="dataFilter" name="dataFilter" class="p-2 border rounded">
-                <option value="graph">По графику</option>
-                <option value="attendance">По посещаемости</option>
-                <option value="branch">По филиалам</option>
-              </select>
-            </div>
-            <div class="flex flex-wrap justify-between gap-1 p-1 animate__animated animate__fadeIn" id="branchFilterContainer" style="display: none;">
-              <label for="branchFilter">Фильтр по филиалам:</label>
-              <select id="branchFilter" name="branchFilter" class="p-2 border rounded">
-                <option value="all">Все филиалы</option>
-              </select>
-            </div>
-            <div class="flex flex-col p-2 animate__animated animate__fadeIn animate__delay-1s">
-              <div class="chart-container">
-                <canvas id="chart1" class="mb-4" style="max-height: 400px;"></canvas>
-              </div>
-              <div class="chart-container">
-                <canvas id="chart2" class="chart-large" style="max-height: 700px;"></canvas>
-              </div>
-            </div>
-          </div>
+    <header>
+        <div class="container">
+            <h1>Branch Attendance Statistics</h1>
         </div>
-      </div>
-      <footer class="flex items-center justify-center whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-12">
-        <div class="flex items-center gap-4 text-[#181411]">
-          <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Courier Reports <3</h2>
-        </div>
-      </footer>
-    </div>
-    <script src="scripts.js"></script>
+    </header>
+    <main class="container">
+        <section id="date-picker">
+            <input type="text" name="daterange" id="daterange" />
+        </section>
+        <section id="charts">
+            <h2>Charts</h2>
+            <div class="chart-container-row">
+                <div class="chart-container" style="width: 70%;">
+                    <canvas id="percentageChart"></canvas>
+                </div>
+                <div class="chart-container" style="width: 30%;">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-controls">
+                    <button id="attendanceFilter" class="active">Attendance</button>
+                    <button id="presenceFilter">Presence</button>
+                </div>
+                <canvas id="branchChart"></canvas>
+            </div>
+        </section>
+    </main>
 </body>
 </html>
