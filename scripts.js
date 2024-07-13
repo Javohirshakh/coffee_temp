@@ -150,4 +150,4 @@ async function updateData() {
 }
 
 updateData(); // Initial load
-setInterval(updateData, 60000); // Update data every minute
+setInterval(updateData, 10000); // Update data every minute
