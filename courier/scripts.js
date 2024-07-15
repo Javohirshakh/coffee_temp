@@ -11,6 +11,8 @@ const googleSheetUrl = 'https://script.googleusercontent.com/macros/echo?user_co
 let currentFilter = 'attendance';
 let data = [];
 let branchChart;
+let percentageChart;
+let pieChart;
 
 async function updateData(startDate, endDate) {
     try {
@@ -41,17 +43,17 @@ async function updateData(startDate, endDate) {
         const sortedBranchData = sortedBranches.map(item => item.percentage);
 
         // Destroy previous chart if it exists
-        if (window.percentageChart && typeof window.percentageChart.destroy === 'function') {
-            window.percentageChart.destroy();
+        if (percentageChart && typeof percentageChart.destroy === 'function') {
+            percentageChart.destroy();
         }
 
         // Create percentage chart
-        window.percentageChart = new Chart(document.getElementById('percentageChart'), {
+        percentageChart = new Chart(document.getElementById('percentageChart'), {
             type: 'bar',
             data: {
                 labels: sortedBranchLabels,
                 datasets: [{
-                    label: 'Percentage',
+                    label: '(%) foiz ko\'rsatkichida',
                     data: sortedBranchData,
                     backgroundColor: sortedBranchData.map(value => {
                         const hue = ((100 - value) / 100) * 120; // Green to red
@@ -87,15 +89,15 @@ async function updateData(startDate, endDate) {
         const totalAbsent = filteredData.reduce((sum, record) => sum + record.absentEmployees, 0);
 
         // Destroy previous chart if it exists
-        if (window.pieChart && typeof window.pieChart.destroy === 'function') {
-            window.pieChart.destroy();
+        if (pieChart && typeof pieChart.destroy === 'function') {
+            pieChart.destroy();
         }
 
         // Create pie chart
-        window.pieChart = new Chart(document.getElementById('pieChart'), {
+        pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'pie',
             data: {
-                labels: ['On Time', 'Late', 'Absent'],
+                labels: ['Vaqtida', 'Kechikkan', 'Kelmagan'],
                 datasets: [{
                     data: [totalOnTime, totalLate, totalAbsent],
                     backgroundColor: [
@@ -151,7 +153,7 @@ async function updateData(startDate, endDate) {
         });
 
         const branchSelect = document.getElementById('branchSelect');
-        branchSelect.innerHTML = '<option value="">Выберите филиал</option>';
+        branchSelect.innerHTML = '<option value="">Select Branch</option>';
         branches.forEach(branch => {
             const option = document.createElement('option');
             option.value = branch;
@@ -164,19 +166,19 @@ async function updateData(startDate, endDate) {
             data: {
                 labels: branches,
                 datasets: [{
-                    label: 'Iron Attendance',
+                    label: 'Jelezniy grafik bo\'yicha',
                     data: ironAttendance,
                     backgroundColor: 'rgba(54, 162, 235, 0.8)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }, {
-                    label: 'Fact Attendance',
+                    label: 'Xodimlar (fakt)',
                     data: factAttendance,
                     backgroundColor: 'rgba(255, 206, 86, 0.8)',
                     borderColor: 'rgba(255, 206, 86, 1)',
                     borderWidth: 1
                 }, {
-                    label: 'Resting Employee',
+                    label: 'Dam olgan',
                     data: restingEmployee,
                     backgroundColor: 'rgba(153, 102, 255, 0.8)',
                     borderColor: 'rgba(153, 102, 255, 1)',
@@ -211,19 +213,19 @@ async function updateData(startDate, endDate) {
             if (currentFilter !== 'attendance') {
                 branchChart.destroy();
                 branchChartConfig.data.datasets = [{
-                    label: 'Iron Attendance',
+                    label: 'Jelezniy grafik bo\'yicha',
                     data: ironAttendance,
                     backgroundColor: 'rgba(54, 162, 235, 0.8)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }, {
-                    label: 'Fact Attendance',
+                    label: 'Xodimlar (fakt)',
                     data: factAttendance,
                     backgroundColor: 'rgba(255, 206, 86, 0.8)',
                     borderColor: 'rgba(255, 206, 86, 1)',
                     borderWidth: 1
                 }, {
-                    label: 'Resting Employee',
+                    label: 'Dam olgan',
                     data: restingEmployee,
                     backgroundColor: 'rgba(153, 102, 255, 0.8)',
                     borderColor: 'rgba(153, 102, 255, 1)',
@@ -242,19 +244,19 @@ async function updateData(startDate, endDate) {
             if (currentFilter !== 'presence') {
                 branchChart.destroy();
                 branchChartConfig.data.datasets = [{
-                    label: 'On Time Employees',
+                    label: 'Vaqtida kelgan',
                     data: onTimeEmployees,
                     backgroundColor: 'rgba(75, 192, 192, 0.8)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }, {
-                    label: 'Late Employees',
+                    label: 'Kechikkan',
                     data: lateEmployees,
                     backgroundColor: 'rgba(255, 206, 86, 0.8)',
                     borderColor: 'rgba(255, 206, 86, 1)',
                     borderWidth: 1
                 }, {
-                    label: 'Absent Employees',
+                    label: 'Kelmagan',
                     data: absentEmployees,
                     backgroundColor: 'rgba(255, 99, 132, 0.8)',
                     borderColor: 'rgba(255, 99, 132, 1)',
@@ -272,54 +274,13 @@ async function updateData(startDate, endDate) {
         document.getElementById('branchFilter').addEventListener('click', () => {
             if (currentFilter !== 'branch') {
                 branchChart.destroy();
-                const selectedBranch = branchSelect.value;
-                if (!selectedBranch) {
-                    branchChartConfig.data.labels = [];
-                    branchChartConfig.data.datasets.forEach(dataset => dataset.data = []);
-                    branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
-                    return;
-                }
-                const branchRecords = filteredData.filter(record => record.branch === selectedBranch);
-                const dates = Array.from(new Set(branchRecords.map(record => record.date)));
-
-                const branchOnTimeEmployees = dates.map(date => {
-                    const records = branchRecords.filter(record => record.date === date);
-                    return records.reduce((sum, record) => sum + record.onTimeEmployees, 0);
-                });
-                const branchLateEmployees = dates.map(date => {
-                    const records = branchRecords.filter(record => record.date === date);
-                    return records.reduce((sum, record) => sum + record.lateEmployees, 0);
-                });
-                const branchAbsentEmployees = dates.map(date => {
-                    const records = branchRecords.filter(record => record.date === date);
-                    return records.reduce((sum, record) => sum + record.absentEmployees, 0);
-                });
-
-                branchChartConfig.data.labels = dates;
-                branchChartConfig.data.datasets = [{
-                    label: 'On Time Employees',
-                    data: branchOnTimeEmployees,
-                    backgroundColor: 'rgba(75, 192, 192, 0.8)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }, {
-                    label: 'Late Employees',
-                    data: branchLateEmployees,
-                    backgroundColor: 'rgba(255, 206, 86, 0.8)',
-                    borderColor: 'rgba(255, 206, 86, 1)',
-                    borderWidth: 1
-                }, {
-                    label: 'Absent Employees',
-                    data: branchAbsentEmployees,
-                    backgroundColor: 'rgba(255, 99, 132, 0.8)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }];
+                document.getElementById('branchSelect').value = ''; // Reset the branch select value
                 currentFilter = 'branch';
                 document.getElementById('attendanceFilter').classList.remove('active');
                 document.getElementById('presenceFilter').classList.remove('active');
                 document.getElementById('branchFilter').classList.add('active');
                 document.getElementById('branchSelect').style.display = 'inline';
+                branchChartConfig.data.datasets = [];
                 branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
             }
         });
@@ -352,19 +313,19 @@ async function updateData(startDate, endDate) {
 
                 branchChartConfig.data.labels = dates;
                 branchChartConfig.data.datasets = [{
-                    label: 'On Time Employees',
+                    label: 'Vaqtida kelgan',
                     data: branchOnTimeEmployees,
                     backgroundColor: 'rgba(75, 192, 192, 0.8)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }, {
-                    label: 'Late Employees',
+                    label: 'Kechikkan',
                     data: branchLateEmployees,
                     backgroundColor: 'rgba(255, 206, 86, 0.8)',
                     borderColor: 'rgba(255, 206, 86, 1)',
                     borderWidth: 1
                 }, {
-                    label: 'Absent Employees',
+                    label: 'Kelmagan',
                     data: branchAbsentEmployees,
                     backgroundColor: 'rgba(255, 99, 132, 0.8)',
                     borderColor: 'rgba(255, 99, 132, 1)',
@@ -387,6 +348,14 @@ document.addEventListener('DOMContentLoaded', function () {
         endDate: moment()
     }, function (start, end, label) {
         updateData(start.toDate(), end.toDate());
+        if (end.diff(start, 'days') > 0) {
+            document.getElementById('attendanceFilter').disabled = true;
+            document.getElementById('presenceFilter').disabled = true;
+            document.getElementById('branchFilter').click(); // Auto-select branch filter
+        } else {
+            document.getElementById('attendanceFilter').disabled = false;
+            document.getElementById('presenceFilter').disabled = false;
+        }
     });
 
     const initialStartDate = moment();

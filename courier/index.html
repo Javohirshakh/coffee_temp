@@ -7,7 +7,7 @@
     <link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Be+Vietnam+Pro%3Awght%40400%3B500%3B700%3B900"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="styles.css" />
-    <title>Branch Attendance Statistics</title>
+    <title>Apexpizza Courier Attendance Statistics</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -27,7 +27,7 @@
         <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
           <div class="flex items-center gap-4 text-[#181411]">
             <img src="../images/logo.png" alt="логотип" class="logo">
-            <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Branch Attendance Statistics</h2>
+            <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza Kuryerlar statistikasi</h2>
           </div>
         </header>
         <div class="px-20 flex flex-1 justify-center py-1">
@@ -46,12 +46,10 @@
               </div>
               <div class="chart-container" style="position: relative;">
                 <div class="chart-controls">
-                    <button id="attendanceFilter" class="active">Attendance</button>
-                    <button id="presenceFilter">Presence</button>
-                    <button id="branchFilter">Branch</button>
-                    <select id="branchSelect" style="display: none; margin-left: 10px;">
-                        <option value="">Выберите филиал</option>
-                    </select>
+                    <button id="attendanceFilter" class="active">Grafik</button>
+                    <button id="presenceFilter">Davomad</button>
+                    <button id="branchFilter">Filial bo'yicha</button>
+                    <select id="branchSelect" style="display: none; margin-left: 10px;"></select>
                 </div>
                 <canvas id="branchChart" style="width: 100%;"></canvas>
               </div>
@@ -61,7 +59,7 @@
       </div>
       <footer class="flex items-center justify-center whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-12">
         <div class="flex items-center gap-4 text-[#181411]">
-          <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Branch Attendance Statistics</h2>
+          <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza <3 </h2>
         </div>
       </footer>
     </div>
