@@ -40,16 +40,24 @@ async function updateData(startDate, endDate) {
         const sortedBranchLabels = sortedBranches.map(item => item.branch);
         const sortedBranchData = sortedBranches.map(item => item.percentage);
 
+        // Destroy previous chart if it exists
+        if (window.percentageChart && typeof window.percentageChart.destroy === 'function') {
+            window.percentageChart.destroy();
+        }
+
         // Create percentage chart
-        new Chart(document.getElementById('percentageChart'), {
+        window.percentageChart = new Chart(document.getElementById('percentageChart'), {
             type: 'bar',
             data: {
                 labels: sortedBranchLabels,
                 datasets: [{
                     label: 'Percentage',
                     data: sortedBranchData,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: sortedBranchData.map(value => {
+                        const hue = ((100 - value) / 100) * 120; // Green to red
+                        return `hsl(${hue}, 100%, 50%)`;
+                    }),
+                    borderColor: 'rgba(0, 0, 0, 0.1)',
                     borderWidth: 1
                 }]
             },
@@ -57,10 +65,20 @@ async function updateData(startDate, endDate) {
                 indexAxis: 'y',
                 scales: {
                     x: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        max: 100
+                    }
+                },
+                plugins: {
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        formatter: (value) => value % 1 === 0 ? value : value.toFixed(2),
+                        color: '#000'
                     }
                 }
-            }
+            },
+            plugins: [ChartDataLabels]
         });
 
         // Data preparation for pie chart
@@ -68,17 +86,22 @@ async function updateData(startDate, endDate) {
         const totalLate = filteredData.reduce((sum, record) => sum + record.lateEmployees, 0);
         const totalAbsent = filteredData.reduce((sum, record) => sum + record.absentEmployees, 0);
 
+        // Destroy previous chart if it exists
+        if (window.pieChart && typeof window.pieChart.destroy === 'function') {
+            window.pieChart.destroy();
+        }
+
         // Create pie chart
-        new Chart(document.getElementById('pieChart'), {
+        window.pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'pie',
             data: {
                 labels: ['On Time', 'Late', 'Absent'],
                 datasets: [{
                     data: [totalOnTime, totalLate, totalAbsent],
                     backgroundColor: [
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(255, 99, 132, 0.2)'
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(255, 99, 132, 0.8)'
                     ],
                     borderColor: [
                         'rgba(75, 192, 192, 1)',
@@ -89,8 +112,15 @@ async function updateData(startDate, endDate) {
                 }]
             },
             options: {
-                responsive: true
-            }
+                responsive: true,
+                plugins: {
+                    datalabels: {
+                        formatter: (value) => value % 1 === 0 ? value : value.toFixed(2),
+                        color: '#fff'
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
         });
 
         // Data preparation for branch chart
@@ -120,7 +150,15 @@ async function updateData(startDate, endDate) {
             return branchRecords.reduce((sum, record) => sum + record.absentEmployees, 0);
         });
 
-        // Create branch chart
+        const branchSelect = document.getElementById('branchSelect');
+        branchSelect.innerHTML = '<option value="">Выберите филиал</option>';
+        branches.forEach(branch => {
+            const option = document.createElement('option');
+            option.value = branch;
+            option.textContent = branch;
+            branchSelect.appendChild(option);
+        });
+
         const branchChartConfig = {
             type: 'bar',
             data: {
@@ -128,19 +166,19 @@ async function updateData(startDate, endDate) {
                 datasets: [{
                     label: 'Iron Attendance',
                     data: ironAttendance,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }, {
                     label: 'Fact Attendance',
                     data: factAttendance,
-                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.8)',
                     borderColor: 'rgba(255, 206, 86, 1)',
                     borderWidth: 1
                 }, {
                     label: 'Resting Employee',
                     data: restingEmployee,
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.8)',
                     borderColor: 'rgba(153, 102, 255, 1)',
                     borderWidth: 1
                 }]
@@ -151,8 +189,17 @@ async function updateData(startDate, endDate) {
                     x: {
                         beginAtZero: true
                     }
+                },
+                plugins: {
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        formatter: (value) => value > 0 ? (value % 1 === 0 ? value : value.toFixed(2)) : '',
+                        color: '#000'
+                    }
                 }
-            }
+            },
+            plugins: [ChartDataLabels]
         };
 
         if (branchChart) {
@@ -166,25 +213,27 @@ async function updateData(startDate, endDate) {
                 branchChartConfig.data.datasets = [{
                     label: 'Iron Attendance',
                     data: ironAttendance,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1
                 }, {
                     label: 'Fact Attendance',
                     data: factAttendance,
-                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.8)',
                     borderColor: 'rgba(255, 206, 86, 1)',
                     borderWidth: 1
                 }, {
                     label: 'Resting Employee',
                     data: restingEmployee,
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.8)',
                     borderColor: 'rgba(153, 102, 255, 1)',
                     borderWidth: 1
                 }];
                 currentFilter = 'attendance';
                 document.getElementById('attendanceFilter').classList.add('active');
                 document.getElementById('presenceFilter').classList.remove('active');
+                document.getElementById('branchFilter').classList.remove('active');
+                document.getElementById('branchSelect').style.display = 'none';
                 branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
             }
         });
@@ -195,25 +244,132 @@ async function updateData(startDate, endDate) {
                 branchChartConfig.data.datasets = [{
                     label: 'On Time Employees',
                     data: onTimeEmployees,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.8)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }, {
                     label: 'Late Employees',
                     data: lateEmployees,
-                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.8)',
                     borderColor: 'rgba(255, 206, 86, 1)',
                     borderWidth: 1
                 }, {
                     label: 'Absent Employees',
                     data: absentEmployees,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.8)',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1
                 }];
                 currentFilter = 'presence';
                 document.getElementById('attendanceFilter').classList.remove('active');
                 document.getElementById('presenceFilter').classList.add('active');
+                document.getElementById('branchFilter').classList.remove('active');
+                document.getElementById('branchSelect').style.display = 'none';
+                branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
+            }
+        });
+
+        document.getElementById('branchFilter').addEventListener('click', () => {
+            if (currentFilter !== 'branch') {
+                branchChart.destroy();
+                const selectedBranch = branchSelect.value;
+                if (!selectedBranch) {
+                    branchChartConfig.data.labels = [];
+                    branchChartConfig.data.datasets.forEach(dataset => dataset.data = []);
+                    branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
+                    return;
+                }
+                const branchRecords = filteredData.filter(record => record.branch === selectedBranch);
+                const dates = Array.from(new Set(branchRecords.map(record => record.date)));
+
+                const branchOnTimeEmployees = dates.map(date => {
+                    const records = branchRecords.filter(record => record.date === date);
+                    return records.reduce((sum, record) => sum + record.onTimeEmployees, 0);
+                });
+                const branchLateEmployees = dates.map(date => {
+                    const records = branchRecords.filter(record => record.date === date);
+                    return records.reduce((sum, record) => sum + record.lateEmployees, 0);
+                });
+                const branchAbsentEmployees = dates.map(date => {
+                    const records = branchRecords.filter(record => record.date === date);
+                    return records.reduce((sum, record) => sum + record.absentEmployees, 0);
+                });
+
+                branchChartConfig.data.labels = dates;
+                branchChartConfig.data.datasets = [{
+                    label: 'On Time Employees',
+                    data: branchOnTimeEmployees,
+                    backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Late Employees',
+                    data: branchLateEmployees,
+                    backgroundColor: 'rgba(255, 206, 86, 0.8)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Absent Employees',
+                    data: branchAbsentEmployees,
+                    backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }];
+                currentFilter = 'branch';
+                document.getElementById('attendanceFilter').classList.remove('active');
+                document.getElementById('presenceFilter').classList.remove('active');
+                document.getElementById('branchFilter').classList.add('active');
+                document.getElementById('branchSelect').style.display = 'inline';
+                branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
+            }
+        });
+
+        branchSelect.addEventListener('change', () => {
+            if (currentFilter === 'branch') {
+                branchChart.destroy();
+                const selectedBranch = branchSelect.value;
+                if (!selectedBranch) {
+                    branchChartConfig.data.labels = [];
+                    branchChartConfig.data.datasets.forEach(dataset => dataset.data = []);
+                    branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
+                    return;
+                }
+                const branchRecords = filteredData.filter(record => record.branch === selectedBranch);
+                const dates = Array.from(new Set(branchRecords.map(record => record.date)));
+
+                const branchOnTimeEmployees = dates.map(date => {
+                    const records = branchRecords.filter(record => record.date === date);
+                    return records.reduce((sum, record) => sum + record.onTimeEmployees, 0);
+                });
+                const branchLateEmployees = dates.map(date => {
+                    const records = branchRecords.filter(record => record.date === date);
+                    return records.reduce((sum, record) => sum + record.lateEmployees, 0);
+                });
+                const branchAbsentEmployees = dates.map(date => {
+                    const records = branchRecords.filter(record => record.date === date);
+                    return records.reduce((sum, record) => sum + record.absentEmployees, 0);
+                });
+
+                branchChartConfig.data.labels = dates;
+                branchChartConfig.data.datasets = [{
+                    label: 'On Time Employees',
+                    data: branchOnTimeEmployees,
+                    backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Late Employees',
+                    data: branchLateEmployees,
+                    backgroundColor: 'rgba(255, 206, 86, 0.8)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Absent Employees',
+                    data: branchAbsentEmployees,
+                    backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }];
                 branchChart = new Chart(document.getElementById('branchChart'), branchChartConfig);
             }
         });
@@ -226,21 +382,18 @@ async function updateData(startDate, endDate) {
 
 document.addEventListener('DOMContentLoaded', function () {
     $('#daterange').daterangepicker({
-        opens: 'left'
+        opens: 'left',
+        startDate: moment(),
+        endDate: moment()
     }, function (start, end, label) {
         updateData(start.toDate(), end.toDate());
     });
 
-    const initialStartDate = moment().subtract(29, 'days');
+    const initialStartDate = moment();
     const initialEndDate = moment();
 
     $('#daterange').data('daterangepicker').setStartDate(initialStartDate);
     $('#daterange').data('daterangepicker').setEndDate(initialEndDate);
 
     updateData(initialStartDate.toDate(), initialEndDate.toDate());
-    setInterval(() => {
-        const start = $('#daterange').data('daterangepicker').startDate;
-        const end = $('#daterange').data('daterangepicker').endDate;
-        updateData(start.toDate(), end.toDate());
-    }, 60000);
 });
