@@ -16,10 +16,14 @@ function dataHasChanged(newData) {
     return JSON.stringify(newData) !== JSON.stringify(currentData);
 }
 
+function calculateMaxY(data, percentageIncrease) {
+    const maxDataValue = Math.max(...data);
+    return Math.ceil(maxDataValue + (maxDataValue * percentageIncrease));
+}
+
 async function updateData() {
     try {
         const newData = await fetchGoogleSheetData(googleSheetUrl);
-        // console.log(newData);
 
         if (!dataHasChanged(newData)) {
             return;
@@ -35,6 +39,8 @@ async function updateData() {
         const ironData = newData.map(record => record.iron);
         const stateData = newData.map(record => record.state);
         const totalData = newData.map(record => record.total);
+
+        const maxYFirstChart = calculateMaxY([...ironData, ...stateData, ...totalData], 0.3);
 
         // Destroy previous chart if it exists
         if (firstChart && typeof firstChart.destroy === 'function') {
@@ -73,16 +79,25 @@ async function updateData() {
             options: {
                 responsive: true,
                 scales: {
-                    x: {
-                        beginAtZero: true
+                    y: {
+                        beginAtZero: true,
+                        max: maxYFirstChart
+                    }
+                },
+                layout: {
+                    padding: {
+                        bottom: 20 // Добавляем нижний отступ
                     }
                 },
                 plugins: {
                     datalabels: {
                         anchor: 'end',
                         align: 'end',
-                        formatter: (value) => value > 0 ? (value % 1 === 0 ? value : value.toFixed(2)) : '',
-                        color: '#000'
+                        formatter: (value) => Math.round(value),
+                        color: '#000',
+                        padding: {
+                            top: 10 // Добавляем верхний отступ для меток данных
+                        }
                     }
                 }
             },
@@ -93,6 +108,8 @@ async function updateData() {
         const onTimeData = newData.map(record => record.onTimeEmployees);
         const lateData = newData.map(record => record.lateEmployees);
         const absentData = newData.map(record => record.absentEmployees);
+
+        const maxYSecondChart = calculateMaxY([...onTimeData, ...lateData, ...absentData], 0.3);
 
         // Destroy previous chart if it exists
         if (secondChart && typeof secondChart.destroy === 'function') {
@@ -131,16 +148,25 @@ async function updateData() {
             options: {
                 responsive: true,
                 scales: {
-                    x: {
-                        beginAtZero: true
+                    y: {
+                        beginAtZero: true,
+                        max: maxYSecondChart
+                    }
+                },
+                layout: {
+                    padding: {
+                        bottom: 20 // Добавляем нижний отступ
                     }
                 },
                 plugins: {
                     datalabels: {
                         anchor: 'end',
                         align: 'end',
-                        formatter: (value) => value > 0 ? (value % 1 === 0 ? value : value.toFixed(2)) : '',
-                        color: '#000'
+                        formatter: (value) => Math.round(value),
+                        color: '#000',
+                        padding: {
+                            top: 10 // Добавляем верхний отступ для меток данных
+                        }
                     }
                 }
             },

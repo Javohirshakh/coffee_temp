@@ -52,7 +52,7 @@ header {
     margin: 1rem 0;
 }
 .chart-container canvas {
-    max-height: 150px;
+    max-height: 180px;
 }
 .chart-title {
     text-align: center;
@@ -78,5 +78,5 @@ header {
 }
 
 footer {
-    transform: translateY(-250px)!important;
+    transform: translateY(-150px)!important;
 }
