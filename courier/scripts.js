@@ -134,22 +134,22 @@ async function updateData() {
                     {
                         label: 'Vaqtida kelganlar',
                         data: onTimeData,
-                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(34, 139, 34, 0.8)',
+                        borderColor: 'rgba(34, 139, 34, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Kechikkanlar',
                         data: lateData,
-                        backgroundColor: 'rgba(255, 206, 86, 0.8)',
-                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgb(255, 0, 0)',
+                        borderColor: 'rgba(220, 20, 60, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Ishga chiqmaganlar',
                         data: absentData,
-                        backgroundColor: 'rgba(255, 99, 132, 0.8)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgb(0, 0, 0)',
+                        borderColor: 'rgb(0, 0, 0)',
                         borderWidth: 1
                     }
                 ]
