@@ -21,6 +21,13 @@ function calculateMaxY(data, percentageIncrease) {
     return Math.ceil(maxDataValue + (maxDataValue * percentageIncrease));
 }
 
+function updateHeader(dates) {
+    const firstDate = dates[0];
+    const lastDate = dates[dates.length - 1];
+    const headerTitle = document.getElementById('header-title');
+    headerTitle.textContent = `Apexpizza Kuryerlar statistikasi (oxirgi 7 kun: ${firstDate} - ${lastDate})`;
+}
+
 async function updateData() {
     try {
         const newData = await fetchGoogleSheetData(googleSheetUrl);
@@ -39,6 +46,8 @@ async function updateData() {
         const ironData = newData.map(record => record.iron);
         const stateData = newData.map(record => record.state);
         const totalData = newData.map(record => record.total);
+
+        updateHeader(dates);
 
         const maxYFirstChart = calculateMaxY([...ironData, ...stateData, ...totalData], 0.3);
 
