@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
-    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Be+Vietnam+Pro%3Awght%40400%3B500%3B700%3B900"/>
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&family=Be+Vietnam+Pro:wght@400;500;700;900"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" href="styles.css" />
     <title>Apexpizza Courier Attendance Statistics</title>
@@ -13,55 +12,40 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment/min/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <script src="scripts.js" defer></script>
 </head>
 <body>
     <div class="loader">
-      <div class="spinner"></div>
+        <div class="spinner"></div>
     </div>
     <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden animate__animated animate__fadeIn" style='font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;'>
-      <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
-          <div class="flex items-center gap-4 text-[#181411]">
-            <img src="../images/logo.png" alt="логотип" class="logo">
-            <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza Kuryerlar statistikasi</h2>
-          </div>
-        </header>
-        <div class="px-20 flex flex-1 justify-center py-1">
-          <div class="layout-content-container flex flex-col max-w-[1400px] flex-1">
-            <div class="flex flex-wrap justify-between gap-1 p-1 animate__animated animate__fadeIn">
-              <input type="text" name="daterange" id="daterange" />
+        <div class="layout-container flex h-full grow flex-col">
+            <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
+                <div class="flex items-center gap-4 text-[#181411]">
+                    <img src="../images/logo.png" alt="логотип" class="logo">
+                    <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza Kuryerlar statistikasi (oxirgi 7 kun)</h2>
+                </div>
+            </header>
+            <div class="px-20 flex flex-1 justify-center py-1">
+                <div class="layout-content-container flex flex-col max-w-[1400px] flex-1">
+                    <div class="flex flex-col p-2 animate__animated animate__fadeIn animate__delay-1s">
+                        <div class="chart-container" style="position: relative;">
+                            <h3 class="chart-title">Kuryerlar soni bo'yicha</h3>
+                            <canvas id="firstChart" style="width: 100%;"></canvas>
+                        </div>
+                        <div class="chart-container" style="position: relative;">
+                            <h3 class="chart-title">Kuryerlar davomadi bo'yicha</h3>
+                            <canvas id="secondChart" style="width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="flex flex-col p-2 animate__animated animate__fadeIn animate__delay-1s">
-              <div class="chart-container-row" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <div class="chart-container" style="width: 70%;">
-                    <canvas id="percentageChart"></canvas>
-                </div>
-                <div class="chart-container" style="width: 30%; margin-left: 20px;">
-                    <canvas id="pieChart"></canvas>
-                </div>
-              </div>
-              <div class="chart-container" style="position: relative;">
-                <div class="chart-controls">
-                    <button id="attendanceFilter" class="active">Grafik</button>
-                    <button id="presenceFilter">Davomad</button>
-                    <button id="branchFilter">Filial bo'yicha</button>
-                    <select id="branchSelect" style="display: none; margin-left: 10px;"></select>
-                </div>
-                <canvas id="branchChart" style="width: 100%;"></canvas>
-              </div>
+        </div>
+        <footer class="flex items-center justify-center whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-12">
+            <div class="flex items-center gap-4 text-[#181411]">
+                <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza <3 </h2>
             </div>
-          </div>
-        </div>
-      </div>
-      <footer class="flex items-center justify-center whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-12">
-        <div class="flex items-center gap-4 text-[#181411]">
-          <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza <3 </h2>
-        </div>
-      </footer>
+        </footer>
     </div>
 </body>
 </html>
