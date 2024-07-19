@@ -6,7 +6,7 @@ async function fetchGoogleSheetData(url) {
     return await response.json();
 }
 
-const googleSheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=hHdEPmXnkjubZpRuFrzFEZTJPudBjJCIsEzgBq5xWBPt2ZCVoBxwyiSwZ4P7oPL-67C6bOaATi2e3CGTxIpFaPnbdf3fQnGlm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnHGEJMJ50ZXFGYsIEc_Ov4oJXIcQERq4ZufpzIosqAcpgIS4d0RfbHXp8W9T2nWLfk4-YCcVgxLFHQE99CojF9lIpQFeFvvMAtz9Jw9Md8uu&lib=MxCcr65cCiDZFciAQak0wvD5qD2GCOdkK';
+const googleSheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=ku7mltm07rRj8Zq3BBufpH4HHyoG4zobdVhRx16hROG-Lt1fjVHwf1Twu54oB5hMmvA4f5Gp4v9II61X1ENty_hGwZReGxxJm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnD1zAvpxYq6r2EMbOrZhm2N-l19A13J-j5l8KBlXdGYQpmrye8wfFofgPewgjubAog9rD9RAr18GNTvyxRgAqfy9I81qUcOFWdz9Jw9Md8uu&lib=MxCcr65cCiDZFciAQak0wvD5qD2GCOdkK';
 
 let currentData = [];
 let firstChart;
@@ -117,8 +117,9 @@ async function updateData() {
         const onTimeData = newData.map(record => record.onTimeEmployees);
         const lateData = newData.map(record => record.lateEmployees);
         const absentData = newData.map(record => record.absentEmployees);
+        const vacationData = newData.map(record => record.vacations);
 
-        const maxYSecondChart = calculateMaxY([...onTimeData, ...lateData, ...absentData], 0.3);
+        const maxYSecondChart = calculateMaxY([...onTimeData, ...lateData, ...absentData, ...vacationData], 0.3);
 
         // Destroy previous chart if it exists
         if (secondChart && typeof secondChart.destroy === 'function') {
@@ -150,6 +151,13 @@ async function updateData() {
                         data: absentData,
                         backgroundColor: 'rgb(0, 0, 0)',
                         borderColor: 'rgb(0, 0, 0)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Dam olganlar',
+                        data: vacationData,
+                        backgroundColor: 'rgba(255, 165, 0, 0.8)',
+                        borderColor: 'rgba(255, 165, 0, 0.8)',
                         borderWidth: 1
                     }
                 ]
