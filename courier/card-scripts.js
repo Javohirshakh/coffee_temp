@@ -66,4 +66,5 @@ async function updateCards() {
 
 document.addEventListener('DOMContentLoaded', function () {
     updateCards();
+    setInterval(updateCards, 10000); // Refresh data every 10 seconds
 });
