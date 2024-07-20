@@ -50,7 +50,7 @@ async function updateCards() {
                 <h4 class="font-bold text-sm mb-2">${card.title}</h4>
                 <div class="flex items-center justify-between w-full mt-1">
                     <p class="current text-sm/[16px] font-medium whitespace-normal">${card.value}</p>
-                    <p class="previous text-sm/[10px] font-normal whitespace-normal ${card.improvement ? 'improvement' : 'decline'}">${card.previous}</p>
+                    <p class="previous text-sm/[8px] font-normal whitespace-normal ${card.improvement ? 'improvement' : 'decline'}">${card.previous}</p>
                 </div>`;
             cardsContainer.appendChild(cardElement);
         });

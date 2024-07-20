@@ -96,8 +96,8 @@ footer {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 130px;
-    max-height: 130px;
+    height: 133px;
+    max-height: 133px;
     margin-left: 10px;
 }
 .current {
@@ -105,7 +105,8 @@ footer {
     font-weight: 500;
 }
 .previous {
-    font-size: 0.75rem;
+    padding: 40px;
+    font-size: 10px;
 }
 .improvement {
     color: #16a34a;
