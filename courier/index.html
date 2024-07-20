@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&family=Be+Vietnam+Pro:wght@400;500;700;900"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?display=swap&family=Be+Vietnam+Pro:wght@400;500;700;900" onload="this.rel='stylesheet'" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="stylesheet" href="styles.css" />
     <title>Apexpizza Courier Attendance Statistics</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
@@ -18,36 +18,40 @@
     <div class="loader">
         <div class="spinner"></div>
     </div>
-    <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden animate__animated animate__fadeIn" style='font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;'>
+    <div class="relative flex size-full min-h-screen flex-col bg-gray-50 group/design-root overflow-x-hidden animate__animated animate__fadeIn" style='font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;'>
         <div class="layout-container flex h-full grow flex-col">
-            <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
-                <div class="flex items-center gap-4 text-[#181411]">
-                    <img src="../images/logo.png" alt="логотип" class="logo">
-                    <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse" id="header-title">Apexpizza Kuryerlar statistikasi (oxirgi 7 kun)</h2>
+            <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-gray-200 px-10 py-3 bg-white shadow-md">
+                <div class="flex items-center gap-4 text-gray-900">
+                    <img src="../images/logo.png" alt="логотип" class="logo w-10 h-10">
+                    <h2 class="text-lg font-bold leading-tight tracking-tight animate__animated animate__pulse" id="header-title">Apexpizza Kuryerlar statistikasi (oxirgi 7 kun)</h2>
                 </div>
             </header>
-            <div class="px-20 flex flex-1 justify-center py-1 wrapper">
-                <div class="layout-content-container flex flex-col max-w-[1400px] flex-1 wrapper">
-                    <div class="flex flex-col p-2 animate__animated animate__fadeIn animate__delay-1s">
-                        <div class="chart-container" style="position: relative;">
+            <div class="px-20 flex flex-1 justify-center py-8 wrapper">
+                <div class="layout-content-container flex flex-col max-w-7xl w-full space-y-2">
+                    <div class="flex flex-col animate__animated animate__fadeIn animate__delay-1s">
+                        <div class="chart-container p-4 bg-white rounded-lg shadow-lg">
                             <h3 class="chart-title">Yetkazib berish statistikasi</h3>
-                            <canvas id="deliveryChart" style="width: 100%; min-height: 170px;"></canvas>
+                            <canvas id="deliveryChart"></canvas>
                         </div>
-                        <div class="chart-container" style="position: relative;">
-                            <h3 class="chart-title">Kuryerlar shtati bo'yicha</h3>
-                            <canvas id="firstChart" style="width: 100%; min-height: 170px;"></canvas>
+                    </div>
+                    <div class="flex flex-col animate__animated animate__fadeIn animate__delay-1s">
+                        <div class="chart-container p-4 bg-white rounded-lg shadow-lg">
+                            <h3 class="chart-title mb-4">Kuryerlar shtati bo'yicha</h3>
+                            <canvas id="firstChart"></canvas>
                         </div>
-                        <div class="chart-container" style="position: relative;">
-                            <h3 class="chart-title">Kuryerlar davomadi bo'yicha</h3>
-                            <canvas id="secondChart" style="width: 100%; min-height: 170px;"></canvas>
+                    </div>
+                    <div class="flex flex-col animate__animated animate__fadeIn animate__delay-1s">
+                        <div class="chart-container p-4 bg-white rounded-lg shadow-lg">
+                            <h3 class="chart-title mb-4">Kuryerlar davomadi bo'yicha</h3>
+                            <canvas id="secondChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <footer class="flex items-center justify-center whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-12">
-            <div class="flex items-center gap-4 text-[#181411]">
-                <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza <3 </h2>
+        <footer class="flex items-center justify-center whitespace-nowrap border-t border-solid border-t-gray-200 px-10 py-12 bg-white shadow-inner">
+            <div class="text-gray-900">
+                <h2 class="text-lg font-bold leading-tight tracking-tight animate__animated animate__pulse">Apexpizza <3</h2>
             </div>
         </footer>
     </div>

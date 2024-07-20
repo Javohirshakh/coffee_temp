@@ -100,7 +100,10 @@ async function updateData() {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        max: maxYFirstChart
+                        max: maxYFirstChart,
+                        grid: {
+                            drawOnChartArea: true, // Вернуть линии сетки по оси y
+                        }
                     }
                 },
                 layout: {
@@ -164,7 +167,10 @@ async function updateData() {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        max: maxYSecondChart
+                        max: maxYSecondChart,
+                        grid: {
+                            drawOnChartArea: true, // Вернуть линии сетки по оси y
+                        }
                     }
                 },
                 layout: {
@@ -221,7 +227,10 @@ async function updateData() {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        max: maxYDeliveryChart
+                        max: maxYDeliveryChart,
+                        grid: {
+                            drawOnChartArea: true, // Вернуть линии сетки по оси y
+                        }
                     }
                 },
                 layout: {

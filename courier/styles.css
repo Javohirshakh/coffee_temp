@@ -1,6 +1,7 @@
 body {
     padding-top: 80px;
     font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;
+    background-color: #f8f9fa;
 }
 header {
     width: 100%;
@@ -8,6 +9,7 @@ header {
     position: fixed;
     background-color: #fff;
     z-index: 99999;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 .logo {
     width: 40px;
@@ -48,15 +50,14 @@ header {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 0 0.2rem;
-    margin: 0.2rem 0;
+    padding: 0.1rem 0.3rem 0;
 }
 .chart-container canvas {
-    max-height: 150px;
+    max-height: 130px;
 }
 .chart-title {
     text-align: center;
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: bold;
 }
 .chart-controls {
@@ -77,4 +78,7 @@ header {
 
 footer {
     transform: translateY(-50px)!important;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
 }
