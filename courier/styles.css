@@ -51,6 +51,7 @@ header {
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 0.1rem 0.3rem 0;
+    margin-right: 10px;
 }
 .chart-container canvas {
     max-height: 130px;
@@ -95,8 +96,9 @@ footer {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 110px;
-    max-height: 110px;
+    height: 114px;
+    max-height: 114px;
+    margin-left: 10px;
 }
 .current {
     font-size: 1rem;
