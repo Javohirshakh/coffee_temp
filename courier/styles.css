@@ -81,3 +81,53 @@ footer {
     border-top: 1px solid #ddd;
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
 }
+
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 110px;
+    max-height: 110px;
+}
+.current {
+    font-size: 1rem;
+    font-weight: 500;
+}
+.previous {
+    font-size: 0.75rem;
+}
+.improvement {
+    color: #16a34a;
+    background-color: rgba(22, 163, 74, 0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+}
+.decline {
+    color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+}
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+.previous {
+    animation: pulse 1.5s infinite;
+}

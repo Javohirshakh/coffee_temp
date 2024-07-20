@@ -12,7 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="scripts.js" defer></script>
+    <script src="chart-scripts.js" defer></script>
+    <script src="card-scripts.js" defer></script>
 </head>
 <body>
     <div class="loader">
@@ -27,22 +28,21 @@
                 </div>
             </header>
             <div class="px-20 flex flex-1 justify-center py-8 wrapper">
-                <div class="layout-content-container flex flex-col max-w-7xl w-full space-y-2">
-                    <div class="flex flex-col animate__animated animate__fadeIn animate__delay-1s">
-                        <div class="chart-container p-4 bg-white rounded-lg shadow-lg">
+                <div class="flex flex-row max-w-7xl w-full">
+                    <div id="cards-container" class="w-1/6 flex flex-col space-y-4 pr-4">
+                        <!-- Карточки будут добавлены здесь -->
+                    </div>
+                    <div class="charts-container w-5/6">
+                        <div class="chart-container p-4 bg-white rounded-lg shadow-lg mb-4">
                             <h3 class="chart-title">Yetkazib berish statistikasi</h3>
                             <canvas id="deliveryChart"></canvas>
                         </div>
-                    </div>
-                    <div class="flex flex-col animate__animated animate__fadeIn animate__delay-1s">
-                        <div class="chart-container p-4 bg-white rounded-lg shadow-lg">
-                            <h3 class="chart-title mb-4">Kuryerlar shtati bo'yicha</h3>
+                        <div class="chart-container p-4 bg-white rounded-lg shadow-lg mb-4">
+                            <h3 class="chart-title">Kuryerlar shtati bo'yicha</h3>
                             <canvas id="firstChart"></canvas>
                         </div>
-                    </div>
-                    <div class="flex flex-col animate__animated animate__fadeIn animate__delay-1s">
-                        <div class="chart-container p-4 bg-white rounded-lg shadow-lg">
-                            <h3 class="chart-title mb-4">Kuryerlar davomadi bo'yicha</h3>
+                        <div class="chart-container p-4 bg-white rounded-lg shadow-lg mb-4">
+                            <h3 class="chart-title">Kuryerlar davomadi bo'yicha</h3>
                             <canvas id="secondChart"></canvas>
                         </div>
                     </div>
