@@ -26,8 +26,8 @@ async function updateCards() {
             },
             {
                 title: 'Yetkazib berish o\'rtacha vaqti',
-                value: `${data.averageDeliveryTime.toFixed(2)} min`,
-                previous: `${data.pwAverageDeliveryTime.toFixed(2)} min`,
+                value: `${data.averageDeliveryTime.toFixed(1)} min`,
+                previous: `${data.pwAverageDeliveryTime.toFixed(1)} min`,
                 improvement: data.averageDeliveryTime <= data.pwAverageDeliveryTime,
                 reverse: true
             },
@@ -51,7 +51,7 @@ async function updateCards() {
             const cardElement = document.createElement('div');
             cardElement.className = 'card p-4 bg-white rounded-lg shadow-lg flex flex-col items-center justify-between';
             cardElement.innerHTML = `
-                <h4 class="font-bold text-lg mb-2">${card.title}</h4>
+                <h4 class="font-bold text-base mb-2">${card.title}</h4>
                 <div class="flex items-center justify-between w-full mt-1">
                     <p class="current text-sm/[16px] font-medium whitespace-normal ${card.reverse ? (card.improvement ? 'decline' : 'improvement') : (card.improvement ? 'improvement' : 'decline')}">${card.value}</p>
                     <p class="previous text-sm/[8px] font-normal previous-style">${card.previous}</p>
