@@ -45,9 +45,9 @@ async function updateCards() {
 
         cards.forEach(card => {
             const cardElement = document.createElement('div');
-            cardElement.className = 'card p-4 bg-white rounded-lg shadow-lg flex flex-col items-center justify-center';
+            cardElement.className = 'card p-4 bg-white rounded-lg shadow-lg flex flex-col items-center justify-between';
             cardElement.innerHTML = `
-                <h4 class="font-bold text-sm mb-2">${card.title}</h4>
+                <h4 class="font-bold text-lg mb-2">${card.title}</h4>
                 <div class="flex items-center justify-between w-full mt-1">
                     <p class="current text-sm/[16px] font-medium whitespace-normal">${card.value}</p>
                     <p class="previous text-sm/[8px] font-normal whitespace-normal ${card.improvement ? 'improvement' : 'decline'}">${card.previous}</p>
