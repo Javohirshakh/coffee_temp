@@ -77,7 +77,6 @@ header {
 }
 
 footer {
-    transform: translateY(-50px)!important;
     background-color: #fff;
     border-top: 1px solid #ddd;
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
