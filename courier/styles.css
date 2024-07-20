@@ -101,12 +101,12 @@ footer {
     margin-left: 10px;
 }
 .current {
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     font-weight: 500;
 }
 .previous {
     margin-top: 2px;
-    font-size: 10px;
+    font-size: 8px;
 }
 .improvement {
     color: #16a34a;
