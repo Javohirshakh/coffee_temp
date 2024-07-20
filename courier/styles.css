@@ -96,8 +96,8 @@ footer {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 133px;
-    max-height: 133px;
+    height: 140px;
+    max-height: 140px;
     margin-left: 10px;
 }
 .current {
