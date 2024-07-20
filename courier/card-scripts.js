@@ -18,28 +18,32 @@ async function updateCards() {
 
         const cards = [
             {
-                title: 'Vaqtida yetkazilgan buyurtmalar (%)',
+                title: 'Vaqtida yetkazilgan buyurtmalar',
                 value: `${(data.onTimeDeliveryPercentage * 100).toFixed(2)}%`,
                 previous: `${(data.pwOnTimeDeliveryPercentage * 100).toFixed(2)}%`,
-                improvement: data.onTimeDeliveryPercentage >= data.pwOnTimeDeliveryPercentage
+                improvement: data.onTimeDeliveryPercentage >= data.pwOnTimeDeliveryPercentage,
+                reverse: false
             },
             {
                 title: 'Yetkazib berish o\'rtacha vaqti',
                 value: `${data.averageDeliveryTime.toFixed(2)} min`,
                 previous: `${data.pwAverageDeliveryTime.toFixed(2)} min`,
-                improvement: data.averageDeliveryTime <= data.pwAverageDeliveryTime
+                improvement: data.averageDeliveryTime <= data.pwAverageDeliveryTime,
+                reverse: true
             },
             {
                 title: 'Jelezniy bo\'yicha kuryerlar soni',
                 value: `${(data.ironToStateRatio * 100).toFixed(2)}%`,
                 previous: `${(data.pwIronToStateRatio * 100).toFixed(2)}%`,
-                improvement: data.ironToStateRatio >= data.pwIronToStateRatio
+                improvement: data.ironToStateRatio >= data.pwIronToStateRatio,
+                reverse: false
             },
             {
-                title: 'Kuryerlar ishga vaqtida kelishi (%)',
+                title: 'Kuryerlar ishga vaqtida kelishi',
                 value: `${(data.onTimeArrivalPercentage * 100).toFixed(2)}%`,
                 previous: `${(data.pwOnTimeArrivalPercentage * 100).toFixed(2)}%`,
-                improvement: data.onTimeArrivalPercentage >= data.pwOnTimeArrivalPercentage
+                improvement: data.onTimeArrivalPercentage >= data.pwOnTimeArrivalPercentage,
+                reverse: false
             }
         ];
 
@@ -49,8 +53,8 @@ async function updateCards() {
             cardElement.innerHTML = `
                 <h4 class="font-bold text-lg mb-2">${card.title}</h4>
                 <div class="flex items-center justify-between w-full mt-1">
-                    <p class="current text-sm/[16px] font-medium whitespace-normal">${card.value}</p>
-                    <p class="previous text-sm/[8px] font-normal whitespace-normal ${card.improvement ? 'improvement' : 'decline'}">${card.previous}</p>
+                    <p class="current text-sm/[16px] font-medium whitespace-normal ${card.reverse ? (card.improvement ? 'decline' : 'improvement') : (card.improvement ? 'improvement' : 'decline')}">${card.value}</p>
+                    <p class="previous text-sm/[8px] font-normal previous-style">${card.previous}</p>
                 </div>`;
             cardsContainer.appendChild(cardElement);
         });

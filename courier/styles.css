@@ -96,16 +96,16 @@ footer {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 138px;
-    max-height: 138px;
+    height: 137px;
+    max-height: 137px;
     margin-left: 10px;
 }
 .current {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
 }
 .previous {
-    padding: 40px;
+    margin-top: 2px;
     font-size: 10px;
 }
 .improvement {
@@ -120,17 +120,9 @@ footer {
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
 }
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-.previous {
-    animation: pulse 1.5s infinite;
+.previous-style {
+    color: #d97706;
+    background-color: rgba(217, 119, 6, 0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
 }
