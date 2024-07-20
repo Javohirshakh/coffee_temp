@@ -54,7 +54,7 @@ header {
     margin-right: 10px;
 }
 .chart-container canvas {
-    max-height: 150px;
+    max-height: 155px;
 }
 .chart-title {
     text-align: center;
@@ -96,8 +96,8 @@ footer {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 137px;
-    max-height: 137px;
+    height: 140px;
+    max-height: 140px;
     margin-left: 10px;
 }
 .current {
