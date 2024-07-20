@@ -54,7 +54,7 @@ header {
     margin-right: 10px;
 }
 .chart-container canvas {
-    max-height: 140px;
+    max-height: 150px;
 }
 .chart-title {
     text-align: center;
