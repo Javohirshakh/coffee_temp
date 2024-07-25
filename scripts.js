@@ -36,7 +36,7 @@ async function updateData() {
                 }
             });
 
-            const progress = (collected / budget) * 100;
+            const progress = Math.min((collected / budget) * 100, 100); // Ограничение прогресса 100%
             const remaining = budget - collected;
 
             document.getElementById('budget').innerText = `Coffee byudjeti: ${budget.toLocaleString()}`;
@@ -148,6 +148,7 @@ async function updateData() {
         console.error('Error updating data:', error);
     }
 }
+
 
 updateData(); // Initial load
 setInterval(updateData, 10000); // Update data every minute

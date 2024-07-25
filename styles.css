@@ -21,6 +21,9 @@ header {
     padding-top: 10px!important;
     padding-bottom: 5px!important;
 }
+#progress {
+    max-width: 100%;
+}
 .progress-fixed {
     position: fixed;
     top: 120px;
