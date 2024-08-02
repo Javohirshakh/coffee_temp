@@ -8,6 +8,7 @@ async function fetchGoogleSheetData(url) {
 
 const googleSheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=GNeh0xbaKjCcSfKTH23nvocD6QFLqJqZAjU-JmDTCeqgGaKrx-bV_gdPFosyCaOi5JhOuX-3J0B4ZhJxIAsUmjAO31AccWfom5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnPUxTgVi1APz0VKbSVgf0-45OXfC-mt1XTs0wtnt9bDCF9AgjHtgnwPUW5-rY9ayp55zOwqhVUjCwF6xwQBPqSQla2ZX9DS17w&lib=MO__Nwa4xWfJmUFM5DPS0T-K7kHi6djVF';
 const googlePeopleUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=17DXOipIb-OK7N9nODdlpkp4DlK_HbyCjX-SF-4VbAB279_c2ZL1bLI-JmXud4Gs6gM_hAWAX-23SOF7V8giaHOu5LO6o6Bdm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnCWnETUP-vVlS3lVh1ahI0dPliBGqlWjPTGUoobFfTb1NkEWftUANc-69I1v2Sh5gif_AcmMMvS5rmH-Q70_DYGBmqR6UpUDVQ&lib=MO__Nwa4xWfJmUFM5DPS0T-K7kHi6djVF';
+const googleDateAndBudgetUrl = 'https://script.google.com/macros/s/AKfycbwLMi_7SbGFGIeqRJ7mPSEjVE78Olb5AzB7ESvGL4OY-s5Z4NvBxtvq2P5grEAdh0Sj/exec';
 
 function getCurrentMonthUzbek() {
     const date = new Date();
@@ -15,20 +16,32 @@ function getCurrentMonthUzbek() {
     return new Intl.DateTimeFormat('uz-UZ', options).format(date);
 }
 
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+}
+
 let previousData = null;
 
 async function updateData() {
     try {
-        let data = await fetchGoogleSheetData(googleSheetUrl); // Изменено на let
+        let data = await fetchGoogleSheetData(googleSheetUrl);
         const peopleData = await fetchGoogleSheetData(googlePeopleUrl);
+        const dateAndBudgetData = await fetchGoogleSheetData(googleDateAndBudgetUrl);
+
+        // Use the budget from the new URL
+        const budget = dateAndBudgetData[0].budget; 
+        const formattedDate = formatDate(dateAndBudgetData[0].actual);
 
         if (JSON.stringify(data) !== JSON.stringify(previousData)) {
             previousData = data;
 
-            const budget = 1500000; // Установите ваш бюджет
             let collected = 0;
 
-            data = data.filter((section) => section.amount > 0); // Фильтрация отделов с нулевой суммой
+            data = data.filter((section) => section.amount > 0); // Filter sections with non-zero amount
 
             data.forEach((section) => {
                 if (section.department !== 'ИТОГ') {
@@ -36,17 +49,20 @@ async function updateData() {
                 }
             });
 
-            const progress = Math.min((collected / budget) * 100, 100); // Ограничение прогресса 100%
+            const progress = Math.min((collected / budget) * 100, 100); // Limit progress to 100%
             const remaining = budget - collected;
 
             document.getElementById('budget').innerText = `Coffee byudjeti: ${budget.toLocaleString()}`;
             document.getElementById('collected').innerText = `${collected.toLocaleString()} yig'ildi`;
             document.getElementById('progress').style.width = `${progress}%`;
-            document.getElementById('month').innerText = getCurrentMonthUzbek();
+
+            const month = getCurrentMonthUzbek();
+            document.getElementById('month').innerText = `${month} (${formattedDate})`;
+
             document.getElementById('remaining').innerText = `Bossda qolgan summa: ${remaining.toLocaleString()}`;
             document.getElementById('total_collected').innerText = `Bizda jarima emas, shunchaki coffeeni yaxshi ko'ramiz :)`;
 
-            // Сортировка секций по убыванию суммы
+            // Sort sections by amount descending
             data.sort((a, b) => b.amount - a.amount);
 
             const sectionsContainer = document.getElementById('sections');
@@ -149,6 +165,5 @@ async function updateData() {
     }
 }
 
-
 updateData(); // Initial load
-setInterval(updateData, 10000); // Update data every minute
+setInterval(updateData, 10000); // Update data every 10 seconds
