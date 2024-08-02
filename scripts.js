@@ -8,7 +8,7 @@ async function fetchGoogleSheetData(url) {
 
 const googleSheetUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=GNeh0xbaKjCcSfKTH23nvocD6QFLqJqZAjU-JmDTCeqgGaKrx-bV_gdPFosyCaOi5JhOuX-3J0B4ZhJxIAsUmjAO31AccWfom5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnPUxTgVi1APz0VKbSVgf0-45OXfC-mt1XTs0wtnt9bDCF9AgjHtgnwPUW5-rY9ayp55zOwqhVUjCwF6xwQBPqSQla2ZX9DS17w&lib=MO__Nwa4xWfJmUFM5DPS0T-K7kHi6djVF';
 const googlePeopleUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=17DXOipIb-OK7N9nODdlpkp4DlK_HbyCjX-SF-4VbAB279_c2ZL1bLI-JmXud4Gs6gM_hAWAX-23SOF7V8giaHOu5LO6o6Bdm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnCWnETUP-vVlS3lVh1ahI0dPliBGqlWjPTGUoobFfTb1NkEWftUANc-69I1v2Sh5gif_AcmMMvS5rmH-Q70_DYGBmqR6UpUDVQ&lib=MO__Nwa4xWfJmUFM5DPS0T-K7kHi6djVF';
-const googleDateAndBudgetUrl = 'https://script.google.com/macros/s/AKfycbwLMi_7SbGFGIeqRJ7mPSEjVE78Olb5AzB7ESvGL4OY-s5Z4NvBxtvq2P5grEAdh0Sj/exec';
+const googleDateAndBudgetUrl = 'https://script.google.com/macros/s/AKfycbxh3glzTbc5iq1NuAF3Lrs4oc25HoLUY2Otxh5u1zTICIqD-UwXD5BJITbsmbF8SSI/exec';
 
 function getCurrentMonthUzbek() {
     const date = new Date();
@@ -32,8 +32,8 @@ async function updateData() {
         const peopleData = await fetchGoogleSheetData(googlePeopleUrl);
         const dateAndBudgetData = await fetchGoogleSheetData(googleDateAndBudgetUrl);
 
-        // Use the budget from the new URL
-        const budget = dateAndBudgetData[0].budget; 
+        const budget = dateAndBudgetData[0].budget;
+        const prevMonth = dateAndBudgetData[0].prevMonth;
         const formattedDate = formatDate(dateAndBudgetData[0].actual);
 
         if (JSON.stringify(data) !== JSON.stringify(previousData)) {
@@ -52,7 +52,12 @@ async function updateData() {
             const progress = Math.min((collected / budget) * 100, 100); // Limit progress to 100%
             const remaining = budget - collected;
 
-            document.getElementById('budget').innerText = `Coffee byudjeti: ${budget.toLocaleString()}`;
+
+            // Display the budget with prevMonth and improvement
+            document.getElementById('budget').innerHTML = `
+                Coffee byudjeti: ${budget.toLocaleString()} 
+                <span class="prev-month">(Oldingi oy: ${prevMonth.toLocaleString()})</span>
+            `;
             document.getElementById('collected').innerText = `${collected.toLocaleString()} yig'ildi`;
             document.getElementById('progress').style.width = `${progress}%`;
 

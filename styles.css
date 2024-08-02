@@ -249,3 +249,9 @@ header {
     margin-left: 5px;
     animation-delay: 0.5s;
 }
+
+.prev-month {
+    font-size: 0.9rem;
+    color: #888;
+    margin-left: 10px;
+}
