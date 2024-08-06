@@ -20,16 +20,16 @@ async function createCharts() {
             labels: data1.map(item => `${item.month}\n(1 заявка - $${item.requestPrice.toFixed(2)})`),
             datasets: [{
                 label: 'Просмотры в месяц (в тысячах)',
-                data: data1.map(item => item.viewsPerMonth / 1000), // делим на 1000 для упрощения масштаба
+                data: data1.map(item => item.viewsPerMonth / 2000), // делим на 1000 для упрощения масштаба
                 backgroundColor: '#42A5F5',
                 stack: 'Stack 0'
             }, {
-                label: 'Потраченная сумма (целевая)',
+                label: 'Потраченная сумма (Таргет)',
                 data: data1.map(item => item.amountSpentTarget),
                 backgroundColor: '#66BB6A',
                 stack: 'Stack 1'
             }, {
-                label: 'Потраченная сумма (компания)',
+                label: 'Потраченная сумма (Услуга)',
                 data: data1.map(item => item.amountSpentCompany),
                 backgroundColor: '#FF7043', // Новый цвет
                 stack: 'Stack 2'
@@ -63,7 +63,7 @@ async function createCharts() {
                         },
                         formatter: function(value, context) {
                             if (context.dataset.label === 'Просмотры в месяц (в тысячах)') {
-                                return (value * 1000).toLocaleString(); // Возвращаем исходное значение
+                                return (value * 2000).toLocaleString(); // Возвращаем исходное значение
                             }
                             if (context.dataset.label.includes('Потраченная сумма')) {
                                 return `$${value.toLocaleString()}`;
@@ -98,7 +98,7 @@ async function createCharts() {
         const data2 = await fetchGoogleSheetData(chart2Url);
 
         const chart2Data = {
-            labels: data2.map(item => `${item.month}\n${item.numOfMeets}`),
+            labels: data2.map(item => `${item.month}\nКоличество встреч: ${item.numOfMeets}`),
             datasets: [{
                 label: 'Средняя стоимость заявки',
                 data: data2.map(item => item.avarageReq),
