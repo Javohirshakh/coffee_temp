@@ -7,43 +7,42 @@ async function fetchGoogleSheetData(url) {
     return await response.json();
 }
 
-const chart1Url = 'https://script.googleusercontent.com/macros/echo?user_content_key=6jCG1IlSdZhPmb-uBJJ7Vwk7njoeIJuPOHkw3u_PfNrM5bUqKz-L4-QCKwdjMDbOqCN7vC37i03WQDHGTrsF_mPlYns0PrcSm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnAd1_rFCfbkaCnKGOnGYayQCt3g9DgXB4aUPmJu-iDPeRNLwLKgVEjM0GjGEitR8gm9P8BBr8tA4LNZ430x1UnCWIw0IF3qkgdz9Jw9Md8uu&lib=MJFLTLCXp-xhR2ulkWT4jSMU_ovHKllUF';
-const chart2Url = 'https://script.googleusercontent.com/macros/echo?user_content_key=uQXK_q6UvY-NjFvD-vOq2C7q4RwBslfX0ViAuEZiifJpEE-d2yhyHTrAMIDjFpX5Wdqk-WMCsWo9_Khs-1yxTFb9IuY9x4lem5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnC9HYAT-7P1Mjbkq5LxANOXRkVWB0yI8cPYatcNrsb_QOaD6APoocmkwlCdSVhGGAGxxkgkD570blVetz2JsbSzFe2DLABp2GNz9Jw9Md8uu&lib=MJFLTLCXp-xhR2ulkWT4jSMU_ovHKllUF';
-const cardsUrl = 'https://script.googleusercontent.com/macros/echo?user_content_key=CZ2mR3Qlu8ITanwCKXzzHtfLaYYiuC0wLIoNj2Gj_YyX3ac6BrIMooeLSLMtKumsvmfQzdLPZrIknjnMZfXmpfL_Ccf2VQ84m5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnKNYCH09L0PXx9cgQiwMPoxvnDRcu8I3-8Sjv0Wnz5xK4NSZwOyOKiJKwDKaDRKcMd5-JxZjRsWazwrXrUpDqD6LJQP9n3sqc9z9Jw9Md8uu&lib=MJFLTLCXp-xhR2ulkWT4jSMU_ovHKllUF';
+const chart1Url = 'https://script.google.com/macros/s/AKfycbyuj66s-C_F-8SOQpDbX46A0hxWt4wavcGl7QTk1LhxeE8tfpJ-xVXpEjMfYUzwpx6eBA/exec?route=reports';
+const chart2Url = 'https://script.google.com/macros/s/AKfycbyuj66s-C_F-8SOQpDbX46A0hxWt4wavcGl7QTk1LhxeE8tfpJ-xVXpEjMfYUzwpx6eBA/exec?route=requests';
+const cardsUrl = 'https://script.google.com/macros/s/AKfycbyuj66s-C_F-8SOQpDbX46A0hxWt4wavcGl7QTk1LhxeE8tfpJ-xVXpEjMfYUzwpx6eBA/exec?route=cards';
 
 async function createCharts() {
     try {
+        // Fetch data for the first chart
         const data1 = await fetchGoogleSheetData(chart1Url);
-        const data2 = await fetchGoogleSheetData(chart2Url);
-        const cardData = await fetchGoogleSheetData(cardsUrl);
 
         const chart1Data = {
-            labels: data1.map(item => `${item.month} (1-заявка ~ $${item.requestPrice.toFixed(2)})`),
+            labels: data1.map(item => `${item.month}\n(1 заявка - $${item.requestPrice.toFixed(2)})`),
             datasets: [{
-                label: 'Просмотры в месяц',
-                data: data1.map(item => item.viewsPerMonth / 2500),
+                label: 'Просмотры в месяц (в тысячах)',
+                data: data1.map(item => item.viewsPerMonth / 1000), // делим на 1000 для упрощения масштаба
                 backgroundColor: '#42A5F5',
                 stack: 'Stack 0'
             }, {
-                label: 'Потраченная сумма',
-                data: data1.map(item => item.amountSpent),
+                label: 'Потраченная сумма (целевая)',
+                data: data1.map(item => item.amountSpentTarget),
                 backgroundColor: '#66BB6A',
                 stack: 'Stack 1'
             }, {
+                label: 'Потраченная сумма (компания)',
+                data: data1.map(item => item.amountSpentCompany),
+                backgroundColor: '#FF7043', // Новый цвет
+                stack: 'Stack 2'
+            }, {
                 label: 'Количество заявок',
                 data: data1.map(item => item.numOfRequests),
-                backgroundColor: '#FFA726',
-                stack: 'Stack 2'
-            }]
-        };
-
-        const chart2Data = {
-            labels: data2.map(item => `${item.month} (встречи: ${item.numOfMeets})`),
-            datasets: [{
-                label: 'Средняя стоимость встречи',
-                data: data2.map(item => item.avarageReq),
-                backgroundColor: '#FFA726',
-                stack: 'Stack 0'
+                backgroundColor: '#29B6F6', // Новый цвет
+                stack: 'Stack 3'
+            }, {
+                label: 'Обработанные заявки',
+                data: data1.map(item => item.numOfProcessedRequests),
+                backgroundColor: '#8D6E63',
+                stack: 'Stack 4'
             }]
         };
 
@@ -63,10 +62,10 @@ async function createCharts() {
                             weight: 'bold'
                         },
                         formatter: function(value, context) {
-                            if (context.dataset.label === 'Просмотры в месяц') {
-                                return (value * 2500).toLocaleString(); // Возвращаем исходное значение
+                            if (context.dataset.label === 'Просмотры в месяц (в тысячах)') {
+                                return (value * 1000).toLocaleString(); // Возвращаем исходное значение
                             }
-                            if (context.dataset.label === 'Потраченная сумма') {
+                            if (context.dataset.label.includes('Потраченная сумма')) {
                                 return `$${value.toLocaleString()}`;
                             }
                             return value.toLocaleString();
@@ -76,6 +75,13 @@ async function createCharts() {
                 scales: {
                     x: {
                         display: true,
+                        ticks: {
+                            callback: function(value) {
+                                // Разбиваем строку с использованием '\n'
+                                const tick = this.getLabelForValue(value);
+                                return tick.split('\n');
+                            }
+                        }
                     },
                     y: {
                         display: true,
@@ -87,6 +93,19 @@ async function createCharts() {
             },
             plugins: [ChartDataLabels]
         });
+
+        // Fetch data for the second chart
+        const data2 = await fetchGoogleSheetData(chart2Url);
+
+        const chart2Data = {
+            labels: data2.map(item => `${item.month}\n${item.numOfMeets}`),
+            datasets: [{
+                label: 'Средняя стоимость заявки',
+                data: data2.map(item => item.avarageReq),
+                backgroundColor: '#AB47BC', // Новый цвет
+                stack: 'Stack 1'
+            }]
+        };
 
         const ctx2 = document.getElementById('chart2').getContext('2d');
         new Chart(ctx2, {
@@ -104,7 +123,7 @@ async function createCharts() {
                         font: {
                             weight: 'bold'
                         },
-                        formatter: function(value, context) {
+                        formatter: function(value) {
                             return `$${value.toLocaleString()}`;
                         }
                     }
@@ -112,6 +131,12 @@ async function createCharts() {
                 scales: {
                     x: {
                         display: true,
+                        ticks: {
+                            callback: function(value) {
+                                const tick = this.getLabelForValue(value);
+                                return tick.split('\n'); // Разбиваем строку с использованием '\n'
+                            }
+                        }
                     },
                     y: {
                         display: true,
@@ -124,12 +149,18 @@ async function createCharts() {
             plugins: [ChartDataLabels]
         });
 
+        // Fetch data for the cards
+        const cardData = await fetchGoogleSheetData(cardsUrl);
+
         // Update card values
         document.getElementById('finalViews').innerText = cardData[0].finalViews.toLocaleString();
-        document.getElementById('finalSpent').innerText = `$${cardData[0].finalSpent.toLocaleString()}`;
+        document.getElementById('finalSpentTarget').innerText = `$${cardData[0].finalSpentTarget.toLocaleString()}`;
+        document.getElementById('finalSpentCompany').innerText = `$${cardData[0].finalSpentCompany.toLocaleString()}`;
         document.getElementById('finalReqs').innerText = cardData[0].finalReqs.toLocaleString();
+        document.getElementById('finalProcessedReqs').innerText = cardData[0].finalProcessedReqs.toLocaleString();
         document.getElementById('finalAvaragePriceOfReq').innerText = `$${cardData[0].finalAvaragePriceOfReq.toFixed(2)}`;
         document.getElementById('finalNumOfMeets').innerText = cardData[0].finalNumOfMeets.toLocaleString();
+        document.getElementById('finalSuccessMeets').innerText = cardData[0].finalSuccessMeets.toLocaleString();
         document.getElementById('finalAvaragePriceOfMeets').innerText = `$${cardData[0].finalAvaragePriceOfMeets.toFixed(2)}`;
 
         document.querySelector('.loader').style.display = 'none';
