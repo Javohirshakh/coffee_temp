@@ -29,12 +29,6 @@ function updateHeader(dates) {
     headerTitle.textContent = `Apexpizza Kuryerlar statistikasi (oxirgi 7 kun: ${firstDate} - ${lastDate})`;
 }
 
-function isWeekend(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDay(); // 0 = Sunday, 6 = Saturday
-    return day === 0 || day === 6;
-}
-
 async function updateData() {
     try {
         const newData = await fetchGoogleSheetData(googleSheetUrl);
@@ -81,22 +75,22 @@ async function updateData() {
                     {
                         label: 'Jelezniy grafik',
                         data: ironData,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(54, 162, 235, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)'),
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Shtat',
                         data: stateData,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(255, 206, 86, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(255, 206, 86, 1)'),
+                        backgroundColor: 'rgba(255, 206, 86, 0.8)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Ishga chiqqanlar',
                         data: totalData,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(75, 192, 192, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'),
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
                     }
                 ]
@@ -104,24 +98,17 @@ async function updateData() {
             options: {
                 responsive: true,
                 scales: {
-                    x: {
-                        ticks: {
-                            color: function(context) {
-                                return isWeekend(dates[context.index]) ? 'red' : 'black';
-                            }
-                        }
-                    },
                     y: {
                         beginAtZero: true,
                         max: maxYFirstChart,
                         grid: {
-                            drawOnChartArea: true,
+                            drawOnChartArea: true, // Вернуть линии сетки по оси y
                         }
                     }
                 },
                 layout: {
                     padding: {
-                        bottom: 20
+                        bottom: 20 // Добавляем нижний отступ
                     }
                 },
                 plugins: {
@@ -131,7 +118,7 @@ async function updateData() {
                         formatter: (value) => Math.round(value),
                         color: '#000',
                         padding: {
-                            top: 10
+                            top: 10 // Добавляем верхний отступ для меток данных
                         }
                     }
                 }
@@ -148,29 +135,29 @@ async function updateData() {
                     {
                         label: 'Vaqtida kelganlar',
                         data: onTimeData,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(34, 139, 34, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(34, 139, 34, 1)'),
+                        backgroundColor: 'rgba(34, 139, 34, 0.8)',
+                        borderColor: 'rgba(34, 139, 34, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Kechikkanlar',
                         data: lateData,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(255, 0, 0, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(220, 20, 60, 1)'),
+                        backgroundColor: 'rgba(255, 0, 0, 0.8)',
+                        borderColor: 'rgba(220, 20, 60, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Ishga chiqmaganlar',
                         data: absentData,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(0, 0, 0, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(0, 0, 0, 1)'),
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        borderColor: 'rgba(0, 0, 0, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Dam olganlar',
                         data: vacationData,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(255, 165, 0, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(255, 165, 0, 1)'),
+                        backgroundColor: 'rgba(255, 165, 0, 0.8)',
+                        borderColor: 'rgba(255, 165, 0, 1)',
                         borderWidth: 1
                     }
                 ]
@@ -178,24 +165,17 @@ async function updateData() {
             options: {
                 responsive: true,
                 scales: {
-                    x: {
-                        ticks: {
-                            color: function(context) {
-                                return isWeekend(dates[context.index]) ? 'red' : 'black';
-                            }
-                        }
-                    },
                     y: {
                         beginAtZero: true,
                         max: maxYSecondChart,
                         grid: {
-                            drawOnChartArea: true,
+                            drawOnChartArea: true, // Вернуть линии сетки по оси y
                         }
                     }
                 },
                 layout: {
                     padding: {
-                        bottom: 20
+                        bottom: 20 // Добавляем нижний отступ
                     }
                 },
                 plugins: {
@@ -205,7 +185,7 @@ async function updateData() {
                         formatter: (value) => Math.round(value),
                         color: '#000',
                         padding: {
-                            top: 10
+                            top: 10 // Добавляем верхний отступ для меток данных
                         }
                     }
                 }
@@ -222,22 +202,22 @@ async function updateData() {
                     {
                         label: 'Vaqtida yetkazib berilgan',
                         data: onTimeDeliveries,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(34, 139, 34, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(34, 139, 34, 1)'),
+                        backgroundColor: 'rgba(34, 139, 34, 0.8)',
+                        borderColor: 'rgba(34, 139, 34, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Kechikib yetkazib berilgan',
                         data: lateDeliveries,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(255, 0, 0, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(220, 20, 60, 1)'),
+                        backgroundColor: 'rgba(255, 0, 0, 0.8)',
+                        borderColor: 'rgba(220, 20, 60, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Oʻrtacha yetkazib berish vaqti',
                         data: avgDeliveryTime,
-                        backgroundColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 0.8)' : 'rgba(75, 192, 192, 0.8)'),
-                        borderColor: dates.map(date => isWeekend(date) ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'),
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
                     }
                 ]
@@ -245,24 +225,17 @@ async function updateData() {
             options: {
                 responsive: true,
                 scales: {
-                    x: {
-                        ticks: {
-                            color: function(context) {
-                                return isWeekend(dates[context.index]) ? 'red' : 'black';
-                            }
-                        }
-                    },
                     y: {
                         beginAtZero: true,
                         max: maxYDeliveryChart,
                         grid: {
-                            drawOnChartArea: true,
+                            drawOnChartArea: true, // Вернуть линии сетки по оси y
                         }
                     }
                 },
                 layout: {
                     padding: {
-                        bottom: 20
+                        bottom: 20 // Добавляем нижний отступ
                     }
                 },
                 plugins: {
@@ -272,7 +245,7 @@ async function updateData() {
                         formatter: (value) => Math.round(value),
                         color: '#000',
                         padding: {
-                            top: 10
+                            top: 10 // Добавляем верхний отступ для меток данных
                         }
                     }
                 }

@@ -79,13 +79,13 @@ header {
 
 footer {
     background-color: #fff;
-    border-top: 1px solid #ddd;
+    border-top: 1px солид #ddd;
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .card {
     background-color: #fff;
-    border: 1px solid #ddd;
+    border: 1px солид #ddd;
     border-radius: 8px;
     padding: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -126,13 +126,4 @@ footer {
     background-color: rgba(217, 119, 6, 0.1);
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
-}
-
-.weekend-card {
-    background-color: rgba(255, 99, 132, 0.1); /* Light red background for weekend cards */
-}
-
-.weekend-label {
-    color: red; /* Red color for weekend labels */
-    font-weight: bold;
 }
