@@ -63,16 +63,9 @@ header {
         transform: rotate(360deg);
     }
 }
-#chart1 {
-    max-height: 500px; /* Устанавливаем высоту для первой диаграммы */
-}
 
-#chart3 {
-    max-height: 300px; /* Устанавливаем высоту для второй диаграммы (processed) */
-}
-
-#chart2 {
-    max-height: 300px; /* Устанавливаем высоту для третьей диаграммы */
+.chart-small {
+    max-height: 300px; /* Устанавливаем высоту для processed диаграммы */
 }
 
 .cards-container {

@@ -7,20 +7,31 @@ async function fetchGoogleSheetData(url) {
     return await response.json();
 }
 
-const chart1Url = 'https://script.google.com/macros/s/AKfycbyuj66s-C_F-8SOQpDbX46A0hxWt4wavcGl7QTk1LhxeE8tfpJ-xVXpEjMfYUzwpx6eBA/exec?route=reports';
-const chart2Url = 'https://script.google.com/macros/s/AKfycbyuj66s-C_F-8SOQpDbX46A0hxWt4wavcGl7QTk1LhxeE8tfpJ-xVXpEjMfYUzwpx6eBA/exec?route=requests';
-const cardsUrl = 'https://script.google.com/macros/s/AKfycbyuj66s-C_F-8SOQpDbX46A0hxWt4wavcGl7QTk1LhxeE8tfpJ-xVXpEjMfYUzwpx6eBA/exec?route=cards';
+const chart1Url = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=reports';
+const chart2Url = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=requests';
+const chart3Url = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=processed';
+const cardsUrl = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=cards';
+const actualDateUrl = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=actual';
 
 async function createCharts() {
     try {
+        // Fetch data for the actual date
+        const actualDateData = await fetchGoogleSheetData(actualDateUrl);
+        const actualDate = new Date(actualDateData[0].actualDate).toLocaleDateString('ru-RU', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        document.getElementById('actualDate').innerText = actualDate;
+
         // Fetch data for the first chart
         const data1 = await fetchGoogleSheetData(chart1Url);
 
         const chart1Data = {
             labels: data1.map(item => `${item.month}\n(1 заявка - $${item.requestPrice.toFixed(2)})`),
             datasets: [{
-                label: 'Просмотры в месяц (в тысячах)',
-                data: data1.map(item => item.viewsPerMonth / 2000), // делим на 1000 для упрощения масштаба
+                label: 'Просмотры в месяц',
+                data: data1.map(item => item.viewsPerMonth / 2000), // делим на 2000 для упрощения масштаба
                 backgroundColor: '#42A5F5',
                 stack: 'Stack 0'
             }, {
@@ -53,6 +64,13 @@ async function createCharts() {
             options: {
                 responsive: true,
                 plugins: {
+                    title: {
+                        display: true,
+                        text: 'Общая статистика таргета',
+                        font: {
+                            size: 18,
+                        }
+                    },
                     datalabels: {
                         display: true,
                         align: 'end',
@@ -62,8 +80,8 @@ async function createCharts() {
                             weight: 'bold'
                         },
                         formatter: function(value, context) {
-                            if (context.dataset.label === 'Просмотры в месяц (в тысячах)') {
-                                return (value * 2000).toLocaleString(); // Возвращаем исходное значение
+                            if (context.dataset.label === 'Просмотры в месяц ') {
+                                return (value * 1000).toLocaleString(); // Возвращаем исходное значение
                             }
                             if (context.dataset.label.includes('Потраченная сумма')) {
                                 return `$${value.toLocaleString()}`;
@@ -94,7 +112,77 @@ async function createCharts() {
             plugins: [ChartDataLabels]
         });
 
-        // Fetch data for the second chart
+        // Fetch data for the processed chart (second chart)
+        const data3 = await fetchGoogleSheetData(chart3Url);
+
+        const chart3Data = {
+            labels: data3.map(item => item.month),
+            datasets: [{
+                label: 'Новые заявки',
+                data: data3.map(item => item.newReqs),
+                backgroundColor: '#26C6DA', // Новый цвет
+                stack: 'Stack 0'
+            }, {
+                label: 'Обработанные заявки',
+                data: data3.map(item => item.processedReqs),
+                backgroundColor: '#66BB6A', // Новый цвет
+                stack: 'Stack 1'
+            }, {
+                label: 'В процессе',
+                data: data3.map(item => item.onProcess),
+                backgroundColor: '#FFCA28', // Новый цвет
+                stack: 'Stack 2'
+            }, {
+                label: 'Необработанные заявки',
+                data: data3.map(item => item.notProcessed),
+                backgroundColor: '#EF5350', // Новый цвет
+                stack: 'Stack 3'
+            }]
+        };
+
+        const ctx3 = document.getElementById('chart3').getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: chart3Data,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Статус обработки заявок',
+                        font: {
+                            size: 18,
+                        }
+                    },
+                    datalabels: {
+                        display: true,
+                        align: 'end',
+                        anchor: 'end',
+                        color: 'black',
+                        font: {
+                            weight: 'bold'
+                        },
+                        formatter: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                    },
+                    y: {
+                        display: true,
+                        grid: {
+                            drawOnChartArea: true,
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        // Fetch data for the third chart
         const data2 = await fetchGoogleSheetData(chart2Url);
 
         const chart2Data = {
@@ -115,6 +203,13 @@ async function createCharts() {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
+                    title: {
+                        display: true,
+                        text: 'Средняя стоимость заявок',
+                        font: {
+                            size: 18,
+                        }
+                    },
                     datalabels: {
                         display: true,
                         align: 'end',
