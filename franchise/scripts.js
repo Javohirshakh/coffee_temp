@@ -33,7 +33,7 @@ async function createCharts() {
             labels: data1.map(item => `${item.month}\n(1 заявка - $${item.requestPrice.toFixed(2)})`),
             datasets: [{
                 label: 'Просмотры в месяц',
-                data: data1.map(item => item.viewsPerMonth / 2000), // делим на 2000 для упрощения масштаба
+                data: data1.map(item => item.viewsPerMonth / 1000), // делим на 1000 для упрощения масштаба
                 backgroundColor: '#42A5F5',
                 stack: 'Stack 0'
             }, {
