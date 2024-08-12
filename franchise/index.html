@@ -24,7 +24,7 @@
     </div>
     <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden animate__animated animate__fadeIn" style='font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;'>
       <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3 shadow-md">
           <div class="flex items-center gap-4 text-[#181411]">
             <img src="../images/logo.png" alt="логотип" class="logo">
             <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] animate__animated animate__pulse">Apexpizza Franchise ADS reports</h2>
@@ -39,53 +39,63 @@
               <p id="chartTitle" class="text-[#181411] text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">ADS reports</p>
             </div>
             <div class="cards-container flex justify-between gap-4 p-2 animate__animated animate__fadeIn">
-              <div class="card">
+              <div class="card shadow-lg">
                 <p class="card-title">Просмотры</p>
                 <p class="card-value" id="finalViews"></p>
               </div>
               <div class="card-column">
-                <div class="card">
+                <div class="card shadow-lg">
+                  <p class="card-title">Итоговая сумма</p>
+                  <p class="card-value" id="totalSpent"></p>
+                </div>
+                <div class="card shadow-lg">
                   <p class="card-title">Потрачено (Таргет)</p>
                   <p class="card-value" id="finalSpentTarget"></p>
                 </div>
-                <div class="card">
+                <div class="card shadow-lg">
                   <p class="card-title">Потрачено (Услуга)</p>
                   <p class="card-value" id="finalSpentCompany"></p>
                 </div>
               </div>
               <div class="card-column">
-                <div class="card">
+                <div class="card shadow-lg">
                   <p class="card-title">Заявки</p>
                   <p class="card-value" id="finalReqs"></p>
                 </div>
-                <div class="card">
+                <div class="card shadow-lg">
                   <p class="card-title">Обработанные заявки</p>
                   <p class="card-value" id="finalProcessedReqs"></p>
                 </div>
               </div>
-              <div class="card">
+              <div class="card shadow-lg">
                 <p class="card-title">Средняя цена заявки</p>
                 <p class="card-value" id="finalAvaragePriceOfReq"></p>
               </div>
               <div class="card-column">
-                <div class="card">
+                <div class="card shadow-lg">
                   <p class="card-title">Количество встреч</p>
                   <p class="card-value" id="finalNumOfMeets"></p>
                 </div>
-                <div class="card">
+                <div class="card shadow-lg">
                   <p class="card-title">Количество продаж</p>
                   <p class="card-value" id="finalSuccessMeets"></p>
                 </div>
               </div>
-              <div class="card">
-                <p class="card-title">Средняя стоимость встречи</p>
-                <p class="card-value" id="finalAvaragePriceOfMeets"></p>
+              <div class="card-column">
+                <div class="card shadow-lg">
+                  <p class="card-title">Сумма одной продажи</p>
+                  <p class="card-value" id="costPerSale"></p>
+                </div>
+                <div class="card shadow-lg">
+                  <p class="card-title">Средняя стоимость встречи</p>
+                  <p class="card-value" id="finalAvaragePriceOfMeets"></p>
+                </div>
               </div>
             </div>
             <div class="flex flex-col p-2 animate__animated animate__fadeIn animate__delay-1s">
-              <canvas id="chart1" class="mb-4"></canvas>
-              <canvas id="chart3" class="mb-4"></canvas> <!-- Новый canvas для диаграммы processed -->
-              <canvas id="chart2" class="chart-small"></canvas> <!-- Теперь третий chart -->
+              <canvas id="chart1" class="mb-4 shadow-lg"></canvas>
+              <canvas id="chart3" class="mb-4 shadow-lg"></canvas> <!-- Новый canvas для диаграммы processed -->
+              <canvas id="chart2" class="chart-small shadow-lg"></canvas> <!-- Теперь третий chart -->
             </div>
           </div>
         </div>

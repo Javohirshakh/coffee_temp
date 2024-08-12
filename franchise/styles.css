@@ -63,16 +63,17 @@ header {
         transform: rotate(360deg);
     }
 }
-#chart1 {
-    max-height: 500px; /* Устанавливаем высоту для первой диаграммы */
+#chart1, #chart2, #chart3 {
+    max-height: 500px;
+    border-radius: 8px;
 }
-
 #chart3 {
-    max-height: 300px; /* Устанавливаем высоту для второй диаграммы (processed) */
+    max-height: 300px;
+    border-radius: 8px;
 }
-
 #chart2 {
-    max-height: 300px; /* Устанавливаем высоту для третьей диаграммы */
+    max-height: 300px;
+    border-radius: 8px;
 }
 
 .cards-container {
@@ -86,7 +87,7 @@ header {
     background-color: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
     text-align: center;
     flex: 1 1 100px; /* Уменьшенная ширина основных карточек */
@@ -94,6 +95,11 @@ header {
     display: flex;
     flex-direction: column;
     justify-content: center; /* Вертикальное центрирование */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .card-column {

@@ -26,6 +26,8 @@ async function createCharts() {
 
         // Fetch data for the first chart
         const data1 = await fetchGoogleSheetData(chart1Url);
+        const startDate = data1[0].month;
+        const endDate = data1[data1.length - 1].month;
 
         const chart1Data = {
             labels: data1.map(item => `${item.month}\n(1 заявка - $${item.requestPrice.toFixed(2)})`),
@@ -258,6 +260,16 @@ async function createCharts() {
         document.getElementById('finalSuccessMeets').innerText = cardData[0].finalSuccessMeets.toLocaleString();
         document.getElementById('finalAvaragePriceOfMeets').innerText = `$${cardData[0].finalAvaragePriceOfMeets.toFixed(2)}`;
 
+        // Calculate total spent and cost per sale
+        const totalSpent = cardData[0].finalSpentTarget + cardData[0].finalSpentCompany;
+        document.getElementById('totalSpent').innerText = `$${totalSpent.toLocaleString()}`;
+
+        const costPerSale = totalSpent / cardData[0].finalSuccessMeets;
+        document.getElementById('costPerSale').innerText = `$${costPerSale.toFixed(2)}`;
+
+        // Update title with date range
+        document.getElementById('chartTitle').innerText = `ADS reports (${startDate} - ${endDate})`;
+
         document.querySelector('.loader').style.display = 'none';
     } catch (error) {
         console.error('Error creating charts:', error);
@@ -266,3 +278,4 @@ async function createCharts() {
 }
 
 document.addEventListener('DOMContentLoaded', createCharts);
+
