@@ -1,3 +1,12 @@
+const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbwh0b5RIwftF9Fph7cX7E0cFOxnNSK78JjxrZtKDiZoA5w-Zse6sPy2G-W4x1L1aj-HWg/exec?route=';
+
+const chart1Url = `${BASE_API_URL}reports`;
+const chart2Url = `${BASE_API_URL}requests`;
+const chart3Url = `${BASE_API_URL}processed`;
+const cardsUrl = `${BASE_API_URL}cards`;
+const actualDateUrl = `${BASE_API_URL}actual`;
+const dailyUrl = `${BASE_API_URL}daily`;
+
 async function fetchGoogleSheetData(url) {
     const response = await fetch(url);
     if (!response.ok) {
@@ -6,12 +15,6 @@ async function fetchGoogleSheetData(url) {
     }
     return await response.json();
 }
-
-const chart1Url = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=reports';
-const chart2Url = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=requests';
-const chart3Url = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=processed';
-const cardsUrl = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=cards';
-const actualDateUrl = 'https://script.google.com/macros/s/AKfycbyI0zy06moFV6uYwVfe_zKSs9AMx01dAusGpjLnhcSVc2l6pYP2uO7yLVSpIan7eaA42w/exec?route=actual';
 
 async function createCharts() {
     try {
@@ -26,14 +29,14 @@ async function createCharts() {
 
         // Fetch data for the first chart
         const data1 = await fetchGoogleSheetData(chart1Url);
-        const startDate = data1[0].month;
-        const endDate = data1[data1.length - 1].month;
+        const numberOfMonths = data1.length;
+        document.getElementById('chartTitle').innerText = `ADS reports (последние ${numberOfMonths} месяцев)`;
 
         const chart1Data = {
             labels: data1.map(item => `${item.month}\n(1 заявка - $${item.requestPrice.toFixed(2)})`),
             datasets: [{
                 label: 'Просмотры в месяц',
-                data: data1.map(item => item.viewsPerMonth / 1000), // делим на 1000 для упрощения масштаба
+                data: data1.map(item => item.viewsPerMonth / 1000),
                 backgroundColor: '#42A5F5',
                 stack: 'Stack 0'
             }, {
@@ -44,12 +47,12 @@ async function createCharts() {
             }, {
                 label: 'Потраченная сумма (Услуга)',
                 data: data1.map(item => item.amountSpentCompany),
-                backgroundColor: '#FF7043', // Новый цвет
+                backgroundColor: '#FF7043',
                 stack: 'Stack 2'
             }, {
                 label: 'Количество заявок',
                 data: data1.map(item => item.numOfRequests),
-                backgroundColor: '#29B6F6', // Новый цвет
+                backgroundColor: '#29B6F6',
                 stack: 'Stack 3'
             }, {
                 label: 'Обработанные заявки',
@@ -82,8 +85,8 @@ async function createCharts() {
                             weight: 'bold'
                         },
                         formatter: function(value, context) {
-                            if (context.dataset.label === 'Просмотры в месяц ') {
-                                return (value * 1000).toLocaleString(); // Возвращаем исходное значение
+                            if (context.dataset.label === 'Просмотры в месяц') {
+                                return (value * 1000).toLocaleString();
                             }
                             if (context.dataset.label.includes('Потраченная сумма')) {
                                 return `$${value.toLocaleString()}`;
@@ -97,7 +100,6 @@ async function createCharts() {
                         display: true,
                         ticks: {
                             callback: function(value) {
-                                // Разбиваем строку с использованием '\n'
                                 const tick = this.getLabelForValue(value);
                                 return tick.split('\n');
                             }
@@ -114,6 +116,86 @@ async function createCharts() {
             plugins: [ChartDataLabels]
         });
 
+        // Fetch data for the daily chart (new chart)
+        const dailyData = await fetchGoogleSheetData(dailyUrl);
+
+        const dailyChartData = {
+            labels: dailyData.map(item => new Date(item.date).toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'short'
+            })),
+            datasets: [{
+                label: 'Новые заявки',
+                data: dailyData.map(item => item.newReqs),
+                backgroundColor: '#26C6DA',
+                stack: 'Stack 0'
+            }, {
+                label: 'Обработанные заявки',
+                data: dailyData.map(item => item.processedReqs),
+                backgroundColor: '#66BB6A',
+                stack: 'Stack 1'
+            }, {
+                label: 'В процессе',
+                data: dailyData.map(item => item.onProcessReqs),
+                backgroundColor: '#FFCA28',
+                stack: 'Stack 2'
+            }, {
+                label: 'Необработанные заявки',
+                data: dailyData.map(item => item.notProcessedReqs),
+                backgroundColor: '#EF5350',
+                stack: 'Stack 3'
+            }]
+        };
+
+        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+
+        // Calculate the maximum Y-axis value
+        const allDailyValues = dailyData.flatMap(item => [item.newReqs, item.processedReqs, item.onProcessReqs, item.notProcessedReqs]);
+        const maxDailyValue = Math.max(...allDailyValues);
+        const yAxisMax = maxDailyValue * 1.2; // Increase by 20%
+
+        new Chart(dailyCtx, {
+            type: 'bar',
+            data: dailyChartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Ежедневная статистика за последние 10 дней',
+                        font: {
+                            size: 18,
+                        }
+                    },
+                    datalabels: {
+                        display: true,
+                        align: 'end',
+                        anchor: 'end',
+                        color: 'black',
+                        font: {
+                            weight: 'bold'
+                        },
+                        formatter: function(value) {
+                            return value.toLocaleString();
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                    },
+                    y: {
+                        display: true,
+                        grid: {
+                            drawOnChartArea: true,
+                        },
+                        max: yAxisMax // Set the maximum value for the Y-axis
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
         // Fetch data for the processed chart (second chart)
         const data3 = await fetchGoogleSheetData(chart3Url);
 
@@ -122,22 +204,22 @@ async function createCharts() {
             datasets: [{
                 label: 'Новые заявки',
                 data: data3.map(item => item.newReqs),
-                backgroundColor: '#26C6DA', // Новый цвет
+                backgroundColor: '#26C6DA',
                 stack: 'Stack 0'
             }, {
                 label: 'Обработанные заявки',
                 data: data3.map(item => item.processedReqs),
-                backgroundColor: '#66BB6A', // Новый цвет
+                backgroundColor: '#66BB6A',
                 stack: 'Stack 1'
             }, {
                 label: 'В процессе',
                 data: data3.map(item => item.onProcess),
-                backgroundColor: '#FFCA28', // Новый цвет
+                backgroundColor: '#FFCA28',
                 stack: 'Stack 2'
             }, {
                 label: 'Необработанные заявки',
                 data: data3.map(item => item.notProcessed),
-                backgroundColor: '#EF5350', // Новый цвет
+                backgroundColor: '#EF5350',
                 stack: 'Stack 3'
             }]
         };
@@ -190,9 +272,9 @@ async function createCharts() {
         const chart2Data = {
             labels: data2.map(item => `${item.month}\nКоличество встреч: ${item.numOfMeets}`),
             datasets: [{
-                label: 'Средняя стоимость заявки',
+                label: 'Средняя стоимость встречи',
                 data: data2.map(item => item.avarageReq),
-                backgroundColor: '#AB47BC', // Новый цвет
+                backgroundColor: '#AB47BC',
                 stack: 'Stack 1'
             }]
         };
@@ -207,7 +289,7 @@ async function createCharts() {
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Средняя стоимость заявок',
+                        text: 'Средняя стоимость встречи',
                         font: {
                             size: 18,
                         }
@@ -231,7 +313,7 @@ async function createCharts() {
                         ticks: {
                             callback: function(value) {
                                 const tick = this.getLabelForValue(value);
-                                return tick.split('\n'); // Разбиваем строку с использованием '\n'
+                                return tick.split('\n');
                             }
                         }
                     },
@@ -267,9 +349,6 @@ async function createCharts() {
         const costPerSale = totalSpent / cardData[0].finalSuccessMeets;
         document.getElementById('costPerSale').innerText = `$${costPerSale.toFixed(2)}`;
 
-        // Update title with date range
-        document.getElementById('chartTitle').innerText = `ADS reports (${startDate} - ${endDate})`;
-
         document.querySelector('.loader').style.display = 'none';
     } catch (error) {
         console.error('Error creating charts:', error);
@@ -278,4 +357,3 @@ async function createCharts() {
 }
 
 document.addEventListener('DOMContentLoaded', createCharts);
-

@@ -63,18 +63,6 @@ header {
         transform: rotate(360deg);
     }
 }
-#chart1, #chart2, #chart3 {
-    max-height: 500px;
-    border-radius: 8px;
-}
-#chart3 {
-    max-height: 300px;
-    border-radius: 8px;
-}
-#chart2 {
-    max-height: 300px;
-    border-radius: 8px;
-}
 
 .cards-container {
     display: flex;
@@ -90,11 +78,11 @@ header {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 15px;
     text-align: center;
-    flex: 1 1 100px; /* Уменьшенная ширина основных карточек */
+    flex: 1 1 100px;
     min-width: 100px;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Вертикальное центрирование */
+    justify-content: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .card:hover {
@@ -106,17 +94,42 @@ header {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    flex: 1 1 100px; /* Еще меньшая ширина для карточек в столбик */
+    flex: 1 1 100px;
 }
 
 .card-title {
-    font-size: 0.85rem; /* Уменьшенный размер шрифта для заголовков */
+    font-size: 0.85rem;
     font-weight: 500;
     color: #111827;
     margin-bottom: 8px;
 }
 .card-value {
-    font-size: 1.2rem; /* Уменьшенный размер шрифта для значений */
+    font-size: 1.2rem;
     font-weight: 700;
     color: #1f2937;
+}
+
+/* Chart size adjustments */
+#chart1 {
+    width: 100%;
+    height: 400px;
+    max-height: 500px;
+}
+
+#dailyChart {
+    width: 100%;
+    height: 200px;
+    max-height: 400px;
+}
+
+#chart2 {
+    width: 100%;
+    height: 300px;
+    max-height: 400px;
+}
+
+#chart3 {
+    width: 100%;
+    height: 300px;
+    max-height: 400px;
 }
