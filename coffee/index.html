@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Be+Vietnam+Pro%3Awght%40400%3B500%3B700%3B900"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Apexpizza Office Coffee Budget</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body>
+    <div class="loader">
+      <div class="spinner"></div>
+    </div>
+    <div class="relative flex size-full min-h-screen flex-col bg-white group/design-root overflow-x-hidden" style='font-family: "Be Vietnam Pro", "Noto Sans", sans-serif;'>
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-3">
+          <div class="flex items-center gap-4 text-[#181411]">
+            <img src="../images/logo.png" alt="logotype" class="logo">
+            <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">Apexpizza</h2>
+          </div>
+        </header>
+        <div class="px-20 flex flex-1 justify-center py-1">
+          <div class="layout-content-container flex flex-col max-w-[1100px] flex-1">
+            <div class="flex flex-wrap justify-between gap-1 p-1 header-fixed">
+              <p id="budget" class="text-[#181411] text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Coffee budjeti: 1 500 000</p>
+            </div>
+            <div class="flex flex-col p-2 progress-fixed">
+              <div class="flex gap-6 justify-between">
+                <p id="collected" class="text-[#181411] text-base font-medium leading-normal">290 000 yig'ildi</p>
+                <p id="remaining" class="text-[#181411] text-base font-medium leading-normal"></p>
+              </div>
+              <div class="rounded bg-[#e5dfdc]">
+                <div id="progress" class="h-2 rounded bg-[#181411]" style="width: 40%;"></div>
+              </div>
+              <p id="month" class="text-[#887263] text-sm font-normal leading-normal"></p>
+            </div>
+            <div class="wrapper">
+              <div class="sections-fixed">
+                <div class="sections">
+                  <h3 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Bo'limlar</h3>
+                  <div id="sections" class="grid grid-cols-2 gap-4"></div>
+                  <div class="flex gap-6 justify-between py-4">
+                    <p id="total_collected" class="text-[#181411] text-base p-4 font-medium leading-normal">Bizda jarima emas, shunchaki coffeeni <br><br><br> yaxshi ko'ramiz :)</p>
+                  </div>
+                </div>
+              </div>
+              <div class="personalList">
+                <h3 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em] pb-1 pl-4 record-fix">Rekordsmenlar</h3>
+                <div id="personalList">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="flex items-center justify-center whitespace-nowrap border-b border-solid border-b-[#f4f2f0] px-10 py-12">
+        <div class="flex items-center gap-4 text-[#181411]">
+          <h2 class="text-[#181411] text-lg font-bold leading-tight tracking-[-0.015em]">Apexpizza <3 </h2>
+        </div>
+      </footer>
+    </div>
+    <script src="scripts.js"></script>
+  </body>
+</html>
