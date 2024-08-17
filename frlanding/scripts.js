@@ -5,6 +5,11 @@ const processedUrl = `${BASE_API_URL}processed`;
 const reportsUrl = `${BASE_API_URL}reports`;
 const actualDateUrl = `${BASE_API_URL}actual`;
 
+let dailyChartInstance = null;
+let processedChartInstance = null;
+let previousDailyData = null;
+let previousProcessedData = null;
+
 async function fetchGoogleSheetData(url) {
     const response = await fetch(url);
     if (!response.ok) {
@@ -12,6 +17,11 @@ async function fetchGoogleSheetData(url) {
         throw new Error('Network response was not ok ' + response.statusText);
     }
     return await response.json();
+}
+
+function isDataChanged(newData, previousData) {
+    if (!previousData) return true; // Если предыдущих данных нет, значит они изменились
+    return JSON.stringify(newData) !== JSON.stringify(previousData);
 }
 
 async function createCharts() {
@@ -28,181 +38,204 @@ async function createCharts() {
         // Fetch data for the daily chart
         const dailyData = await fetchGoogleSheetData(dailyUrl);
 
-        const dailyChartData = {
-            labels: dailyData.map(item => new Date(item.date).toLocaleDateString('ru-RU', {
-                day: 'numeric',
-                month: 'short'
-            })),
-            datasets: [{
-                label: 'Новые заявки',
-                data: dailyData.map(item => item.newReqs),
-                backgroundColor: '#26C6DA',
-                stack: 'Stack 0'
-            }, {
-                label: 'Обработанные заявки',
-                data: dailyData.map(item => item.processedReqs),
-                backgroundColor: '#66BB6A',
-                stack: 'Stack 1'
-            }, {
-                label: 'В процессе',
-                data: dailyData.map(item => item.onProcessReqs),
-                backgroundColor: '#FFCA28',
-                stack: 'Stack 2'
-            }, {
-                label: 'Необработанные заявки',
-                data: dailyData.map(item => item.notProcessedReqs),
-                backgroundColor: '#EF5350',
-                stack: 'Stack 3'
-            }]
-        };
+        if (!isDataChanged(dailyData, previousDailyData)) {
+            // console.log('Daily data has not changed, skipping chart update.');
+        } else {
+            previousDailyData = dailyData;
 
-        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+            const dailyChartData = {
+                labels: dailyData.map(item => new Date(item.date).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'short'
+                })),
+                datasets: [{
+                    label: 'Новые заявки',
+                    data: dailyData.map(item => item.newReqs),
+                    backgroundColor: '#26C6DA',
+                    stack: 'Stack 0'
+                }, {
+                    label: 'Обработанные заявки',
+                    data: dailyData.map(item => item.processedReqs),
+                    backgroundColor: '#66BB6A',
+                    stack: 'Stack 1'
+                }, {
+                    label: 'В процессе',
+                    data: dailyData.map(item => item.onProcessReqs),
+                    backgroundColor: '#FFCA28',
+                    stack: 'Stack 2'
+                }, {
+                    label: 'Необработанные заявки',
+                    data: dailyData.map(item => item.notProcessedReqs),
+                    backgroundColor: '#EF5350',
+                    stack: 'Stack 3'
+                }]
+            };
 
-        // Calculate the maximum Y-axis value
-        const allDailyValues = dailyData.flatMap(item => [item.newReqs, item.processedReqs, item.onProcessReqs, item.notProcessedReqs]);
-        const maxDailyValue = Math.max(...allDailyValues);
-        const yAxisMax = maxDailyValue * 1.2; // Increase by 20%
+            const dailyCtx = document.getElementById('dailyChart').getContext('2d');
 
-        new Chart(dailyCtx, {
-            type: 'bar',
-            data: dailyChartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Ежедневная статистика за последние 10 дней',
-                        font: {
-                            size: 18,
+            // Уничтожаем старый график, если он существует
+            if (dailyChartInstance) {
+                dailyChartInstance.destroy();
+            }
+
+            // Calculate the maximum Y-axis value
+            const allDailyValues = dailyData.flatMap(item => [item.newReqs, item.processedReqs, item.onProcessReqs, item.notProcessedReqs]);
+            const maxDailyValue = Math.max(...allDailyValues);
+            const yAxisMax = maxDailyValue * 1.2; // Increase by 20%
+
+            dailyChartInstance = new Chart(dailyCtx, {
+                type: 'bar',
+                data: dailyChartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Ежедневная статистика за последние 10 дней',
+                            font: {
+                                size: 18,
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            align: 'end',
+                            anchor: 'end',
+                            color: 'black',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return value.toLocaleString();
+                            }
                         }
                     },
-                    datalabels: {
-                        display: true,
-                        align: 'end',
-                        anchor: 'end',
-                        color: 'black',
-                        font: {
-                            weight: 'bold'
+                    scales: {
+                        x: {
+                            display: true,
                         },
-                        formatter: function(value) {
-                            return value.toLocaleString();
+                        y: {
+                            display: true,
+                            grid: {
+                                drawOnChartArea: true,
+                            },
+                            max: yAxisMax // Set the maximum value for the Y-axis
                         }
                     }
                 },
-                scales: {
-                    x: {
-                        display: true,
-                    },
-                    y: {
-                        display: true,
-                        grid: {
-                            drawOnChartArea: true,
-                        },
-                        max: yAxisMax // Set the maximum value for the Y-axis
-                    }
-                }
-            },
-            plugins: [ChartDataLabels]
-        });
+                plugins: [ChartDataLabels]
+            });
+        }
 
         // Fetch data for the processed chart
         const processedData = await fetchGoogleSheetData(processedUrl);
 
-        // Fetch data from the reports route to get total spent and views
-        const reportsData = await fetchGoogleSheetData(reportsUrl);
+        if (!isDataChanged(processedData, previousProcessedData)) {
+            // console.log('Processed data has not changed, skipping chart update.');
+        } else {
+            previousProcessedData = processedData;
 
-        // Update the title to show the number of months
-        const numberOfMonths = reportsData.length;
-        document.getElementById('chartTitle').innerText = `ADS reports (последние ${numberOfMonths} месяцев)`;
+            // Fetch data from the reports route to get total spent and views
+            const reportsData = await fetchGoogleSheetData(reportsUrl);
 
-        // Create a map for easy lookup of views and total spent by month
-        const reportsMap = reportsData.reduce((map, item) => {
-            const totalSpent = item.amountSpentTarget + item.amountSpentCompany;
-            map[item.month] = {
-                totalSpent,
-                views: item.viewsPerMonth
-            };
-            return map;
-        }, {});
+            // Update the title to show the number of months
+            const numberOfMonths = reportsData.length;
+            document.getElementById('chartTitle').innerText = `ADS reports (последние ${numberOfMonths} месяцев)`;
 
-        const processedChartData = {
-            labels: processedData.map(item => {
-                const report = reportsMap[item.month];
-                if (report) {
-                    return `${item.month}\n$${report.totalSpent.toLocaleString()} - ${report.views.toLocaleString()}`;
-                }
-                return item.month;
-            }),
-            datasets: [{
-                label: 'Новые заявки',
-                data: processedData.map(item => item.newReqs),
-                backgroundColor: '#26C6DA',
-                stack: 'Stack 0'
-            }, {
-                label: 'Обработанные заявки',
-                data: processedData.map(item => item.processedReqs),
-                backgroundColor: '#66BB6A',
-                stack: 'Stack 1'
-            }, {
-                label: 'В процессе',
-                data: processedData.map(item => item.onProcess),
-                backgroundColor: '#FFCA28',
-                stack: 'Stack 2'
-            }, {
-                label: 'Необработанные заявки',
-                data: processedData.map(item => item.notProcessed),
-                backgroundColor: '#EF5350',
-                stack: 'Stack 3'
-            }]
-        };
+            // Create a map for easy lookup of views and total spent by month
+            const reportsMap = reportsData.reduce((map, item) => {
+                const totalSpent = item.amountSpentTarget + item.amountSpentCompany;
+                map[item.month] = {
+                    totalSpent,
+                    views: item.viewsPerMonth
+                };
+                return map;
+            }, {});
 
-        const processedCtx = document.getElementById('processedChart').getContext('2d');
-        new Chart(processedCtx, {
-            type: 'bar',
-            data: processedChartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Статус обработки заявок',
-                        font: {
-                            size: 18,
-                        }
-                    },
-                    datalabels: {
-                        display: true,
-                        align: 'end',
-                        anchor: 'end',
-                        color: 'black',
-                        font: {
-                            weight: 'bold'
-                        },
-                        formatter: function(value) {
-                            return value.toLocaleString();
-                        }
+            const processedChartData = {
+                labels: processedData.map(item => {
+                    const report = reportsMap[item.month];
+                    if (report) {
+                        return `${item.month}\n$${report.totalSpent.toLocaleString()} - ${report.views.toLocaleString()}`;
                     }
-                },
-                scales: {
-                    x: {
-                        display: true,
-                        ticks: {
-                            callback: function(value) {
-                                const tick = this.getLabelForValue(value);
-                                return tick.split('\n'); // Split label for better display
+                    return item.month;
+                }),
+                datasets: [{
+                    label: 'Новые заявки',
+                    data: processedData.map(item => item.newReqs),
+                    backgroundColor: '#26C6DA',
+                    stack: 'Stack 0'
+                }, {
+                    label: 'Обработанные заявки',
+                    data: processedData.map(item => item.processedReqs),
+                    backgroundColor: '#66BB6A',
+                    stack: 'Stack 1'
+                }, {
+                    label: 'В процессе',
+                    data: processedData.map(item => item.onProcess),
+                    backgroundColor: '#FFCA28',
+                    stack: 'Stack 2'
+                }, {
+                    label: 'Необработанные заявки',
+                    data: processedData.map(item => item.notProcessed),
+                    backgroundColor: '#EF5350',
+                    stack: 'Stack 3'
+                }]
+            };
+
+            const processedCtx = document.getElementById('processedChart').getContext('2d');
+
+            // Уничтожаем старый график, если он существует
+            if (processedChartInstance) {
+                processedChartInstance.destroy();
+            }
+
+            processedChartInstance = new Chart(processedCtx, {
+                type: 'bar',
+                data: processedChartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Статус обработки заявок',
+                            font: {
+                                size: 18,
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            align: 'end',
+                            anchor: 'end',
+                            color: 'black',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return value.toLocaleString();
                             }
                         }
                     },
-                    y: {
-                        display: true,
-                        grid: {
-                            drawOnChartArea: true,
+                    scales: {
+                        x: {
+                            display: true,
+                            ticks: {
+                                callback: function(value) {
+                                    const tick = this.getLabelForValue(value);
+                                    return tick.split('\n'); // Split label for better display
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            grid: {
+                                drawOnChartArea: true,
+                            }
                         }
                     }
-                }
-            },
-            plugins: [ChartDataLabels]
-        });
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
 
         document.querySelector('.loader').style.display = 'none';
     } catch (error) {
