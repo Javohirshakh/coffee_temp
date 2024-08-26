@@ -1,4 +1,4 @@
-const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbwh0b5RIwftF9Fph7cX7E0cFOxnNSK78JjxrZtKDiZoA5w-Zse6sPy2G-W4x1L1aj-HWg/exec?route=';
+const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbzeJmNGzBJE5kebDGRDEVIkxETo8toNEHEI5vEDJ164BiQBSNUmz9Dzja_zKVROtS87ug/exec?route=';
 
 const chart1Url = `${BASE_API_URL}reports`;
 const chart2Url = `${BASE_API_URL}requests`;
@@ -6,6 +6,9 @@ const chart3Url = `${BASE_API_URL}processed`;
 const cardsUrl = `${BASE_API_URL}cards`;
 const actualDateUrl = `${BASE_API_URL}actual`;
 const dailyUrl = `${BASE_API_URL}daily`;
+
+let dailyChartInstance = null;
+let previousDailyData = null;
 
 async function fetchGoogleSheetData(url) {
     const response = await fetch(url);
@@ -16,9 +19,13 @@ async function fetchGoogleSheetData(url) {
     return await response.json();
 }
 
+function isDataChanged(newData, previousData) {
+    if (!previousData) return true;
+    return JSON.stringify(newData) !== JSON.stringify(previousData);
+}
+
 async function createCharts() {
     try {
-        // Fetch data for the actual date
         const actualDateData = await fetchGoogleSheetData(actualDateUrl);
         const actualDate = new Date(actualDateData[0].actualDate).toLocaleDateString('ru-RU', {
             year: 'numeric',
@@ -27,13 +34,13 @@ async function createCharts() {
         });
         document.getElementById('actualDate').innerText = actualDate;
 
-        // Fetch data for the first chart
+        // Chart 1
         const data1 = await fetchGoogleSheetData(chart1Url);
         const numberOfMonths = data1.length;
         document.getElementById('chartTitle').innerText = `ADS reports (последние ${numberOfMonths} месяцев)`;
 
         const chart1Data = {
-            labels: data1.map(item => `${item.month}\n(1 заявка - $${item.requestPrice.toFixed(2)})`),
+            labels: data1.map(item => `${item.month}\n(1 заявка - $${item.requestPrice?.toFixed(2) || 0})`),
             datasets: [{
                 label: 'Просмотры в месяц',
                 data: data1.map(item => item.viewsPerMonth / 1000),
@@ -41,22 +48,22 @@ async function createCharts() {
                 stack: 'Stack 0'
             }, {
                 label: 'Потраченная сумма (Таргет)',
-                data: data1.map(item => item.amountSpentTarget),
+                data: data1.map(item => item.amountSpentTarget || 0),
                 backgroundColor: '#66BB6A',
                 stack: 'Stack 1'
             }, {
                 label: 'Потраченная сумма (Услуга)',
-                data: data1.map(item => item.amountSpentCompany),
+                data: data1.map(item => item.amountSpentCompany || 0),
                 backgroundColor: '#FF7043',
                 stack: 'Stack 2'
             }, {
                 label: 'Количество заявок',
-                data: data1.map(item => item.numOfRequests),
+                data: data1.map(item => item.numOfRequests || 0),
                 backgroundColor: '#29B6F6',
                 stack: 'Stack 3'
             }, {
                 label: 'Обработанные заявки',
-                data: data1.map(item => item.numOfProcessedRequests),
+                data: data1.map(item => item.numOfProcessedRequests || 0),
                 backgroundColor: '#8D6E63',
                 stack: 'Stack 4'
             }]
@@ -91,7 +98,7 @@ async function createCharts() {
                             if (context.dataset.label.includes('Потраченная сумма')) {
                                 return `$${value.toLocaleString()}`;
                             }
-                            return value.toLocaleString();
+                            return value?.toLocaleString() || '';
                         }
                     }
                 },
@@ -116,109 +123,175 @@ async function createCharts() {
             plugins: [ChartDataLabels]
         });
 
-        // Fetch data for the daily chart (new chart)
+        // Daily Chart
         const dailyData = await fetchGoogleSheetData(dailyUrl);
+        // console.log("Daily Data:", dailyData); // Логирование данных для проверки
 
-        const dailyChartData = {
-            labels: dailyData.map(item => new Date(item.date).toLocaleDateString('ru-RU', {
-                day: 'numeric',
-                month: 'short'
-            })),
-            datasets: [{
-                label: 'Новые заявки',
-                data: dailyData.map(item => item.newReqs),
-                backgroundColor: '#26C6DA',
-                stack: 'Stack 0'
-            }, {
-                label: 'Обработанные заявки',
-                data: dailyData.map(item => item.processedReqs),
-                backgroundColor: '#66BB6A',
-                stack: 'Stack 1'
-            }, {
-                label: 'В процессе',
-                data: dailyData.map(item => item.onProcessReqs),
-                backgroundColor: '#FFCA28',
-                stack: 'Stack 2'
-            }, {
-                label: 'Необработанные заявки',
-                data: dailyData.map(item => item.notProcessedReqs),
-                backgroundColor: '#EF5350',
-                stack: 'Stack 3'
-            }]
-        };
+        if (isDataChanged(dailyData, previousDailyData)) {
+            previousDailyData = dailyData;
 
-        const dailyCtx = document.getElementById('dailyChart').getContext('2d');
+            const dailyChartData = {
+                labels: dailyData.map(item => new Date(item.date).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'short'
+                })),
+                datasets: [{
+                    label: 'Новые заявки',
+                    data: dailyData.map(item => item.newReqs || 0),
+                    backgroundColor: '#26C6DA',
+                    stack: 'Stack 0'
+                }, {
+                    label: 'Квалифицировано',
+                    data: dailyData.map(item => item.qualifiedReqs || 0),
+                    backgroundColor: '#66BB6A',
+                    stack: 'Stack 1'
+                }, {
+                    label: 'Повторные звонки',
+                    data: dailyData.map(item => item.repeatedCalls || 0),
+                    backgroundColor: '#FFCA28',
+                    stack: 'Stack 2'
+                }, {
+                    label: 'Клиент не ответил',
+                    data: dailyData.map(item => item.clientNotRespond || 0),
+                    backgroundColor: '#FFA500',
+                    stack: 'Stack 3'
+                }, {
+                    label: 'Необработанные заявки',
+                    data: dailyData.map(item => item.notProcessedReqs || 0),
+                    backgroundColor: '#EF5350',
+                    stack: 'Stack 4'
+                }]
+            };
 
-        // Calculate the maximum Y-axis value
-        const allDailyValues = dailyData.flatMap(item => [item.newReqs, item.processedReqs, item.onProcessReqs, item.notProcessedReqs]);
-        const maxDailyValue = Math.max(...allDailyValues);
-        const yAxisMax = maxDailyValue * 1.2; // Increase by 20%
+            const dailyCtx = document.getElementById('dailyChart').getContext('2d');
 
-        new Chart(dailyCtx, {
-            type: 'bar',
-            data: dailyChartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Ежедневная статистика за последние 10 дней',
-                        font: {
-                            size: 18,
+            // Уничтожаем старый график, если он существует
+            if (dailyChartInstance) {
+                dailyChartInstance.destroy();
+            }
+
+            // Calculate the maximum Y-axis value
+            const allDailyValues = dailyData.flatMap(item => [
+                item.newReqs, 
+                item.qualifiedReqs, 
+                item.repeatedCalls, 
+                item.clientNotRespond, 
+                item.notProcessedReqs
+            ]);
+            const maxDailyValue = Math.max(...allDailyValues);
+            const yAxisMax = maxDailyValue * 1.2; // Increase by 20%
+
+            dailyChartInstance = new Chart(dailyCtx, {
+                type: 'bar',
+                data: dailyChartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                generateLabels: function(chart) {
+                                    const originalLabels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                                    return originalLabels.map(label => {
+                                        if (label.text === 'Клиент не ответил') {
+                                            label.boxWidth = 20;
+                                            label.boxHeight = 20;
+                                        }
+                                        return label;
+                                    });
+                                },
+                            },
+                        },
+                        title: {
+                            display: true,
+                            text: 'Ежедневная статистика за последние 10 дней',
+                            font: {
+                                size: 18,
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: 'black',
+                            anchor: 'end',
+                            align: 'top',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return value ? value.toLocaleString() : '';
+                            }
                         }
                     },
-                    datalabels: {
-                        display: true,
-                        align: 'end',
-                        anchor: 'end',
-                        color: 'black',
-                        font: {
-                            weight: 'bold'
+                    scales: {
+                        x: {
+                            display: true,
                         },
-                        formatter: function(value) {
-                            return value.toLocaleString();
+                        y: {
+                            display: true,
+                            grid: {
+                                drawOnChartArea: true,
+                            },
+                            max: yAxisMax
                         }
                     }
                 },
-                scales: {
-                    x: {
-                        display: true,
-                    },
-                    y: {
-                        display: true,
-                        grid: {
-                            drawOnChartArea: true,
-                        },
-                        max: yAxisMax // Set the maximum value for the Y-axis
+                plugins: [{
+                    id: 'crossInLegend',
+                    afterDraw: (chart) => {
+                        const ctx = chart.ctx;
+                        const legend = chart.legend;
+                        const items = legend.legendItems;
+
+                        items.forEach((item) => {
+                            if (item.text === 'Клиент не ответил') {
+                                const box = legend.legendHitBoxes[items.indexOf(item)];
+                                const x = box.left + 4;
+                                const y = box.top + 4;
+
+                                ctx.save();
+                                ctx.fillStyle = '#FFA500';
+                                ctx.fillRect(x, y, 7, 7);
+
+                                ctx.strokeStyle = '#FFFFFF';
+                                ctx.lineWidth = 2;
+                                ctx.beginPath();
+                                ctx.moveTo(x + -3, y + -3);
+                                ctx.lineTo(x + 7, y + 7);
+                                ctx.moveTo(x + 7, y + -3);
+                                ctx.lineTo(x + -3, y + 7);
+                                ctx.stroke();
+                                ctx.restore();
+                            }
+                        });
                     }
-                }
-            },
-            plugins: [ChartDataLabels]
-        });
+                }, ChartDataLabels]
+            });
 
-        // Fetch data for the processed chart (second chart)
+            // console.log("Daily Chart Instance:", dailyChartInstance); // Логирование объекта диаграммы
+        }
+
+        // Chart 3
         const data3 = await fetchGoogleSheetData(chart3Url);
-
         const chart3Data = {
             labels: data3.map(item => item.month),
             datasets: [{
                 label: 'Новые заявки',
-                data: data3.map(item => item.newReqs),
+                data: data3.map(item => item.newReqs || 0),
                 backgroundColor: '#26C6DA',
                 stack: 'Stack 0'
             }, {
                 label: 'Обработанные заявки',
-                data: data3.map(item => item.processedReqs),
+                data: data3.map(item => item.processedReqs || 0),
                 backgroundColor: '#66BB6A',
                 stack: 'Stack 1'
             }, {
                 label: 'В процессе',
-                data: data3.map(item => item.onProcess),
+                data: data3.map(item => item.onProcess || 0),
                 backgroundColor: '#FFCA28',
                 stack: 'Stack 2'
             }, {
                 label: 'Необработанные заявки',
-                data: data3.map(item => item.notProcessed),
+                data: data3.map(item => item.notProcessed || 0),
                 backgroundColor: '#EF5350',
                 stack: 'Stack 3'
             }]
@@ -247,7 +320,7 @@ async function createCharts() {
                             weight: 'bold'
                         },
                         formatter: function(value) {
-                            return value.toLocaleString();
+                            return value?.toLocaleString() || '';
                         }
                     }
                 },
@@ -266,14 +339,13 @@ async function createCharts() {
             plugins: [ChartDataLabels]
         });
 
-        // Fetch data for the third chart
+        // Chart 2
         const data2 = await fetchGoogleSheetData(chart2Url);
-
         const chart2Data = {
-            labels: data2.map(item => `${item.month}\nКоличество встреч: ${item.numOfMeets}`),
+            labels: data2.map(item => `${item.month}\nКоличество встреч: ${item.numOfMeets || 0}`),
             datasets: [{
                 label: 'Средняя стоимость встречи',
-                data: data2.map(item => item.avarageReq),
+                data: data2.map(item => item.avarageReq || 0),
                 backgroundColor: '#AB47BC',
                 stack: 'Stack 1'
             }]
@@ -303,7 +375,7 @@ async function createCharts() {
                             weight: 'bold'
                         },
                         formatter: function(value) {
-                            return `$${value.toLocaleString()}`;
+                            return `$${value?.toLocaleString() || '0'}`;
                         }
                     }
                 },
@@ -328,25 +400,23 @@ async function createCharts() {
             plugins: [ChartDataLabels]
         });
 
-        // Fetch data for the cards
+        // Cards
         const cardData = await fetchGoogleSheetData(cardsUrl);
 
-        // Update card values
-        document.getElementById('finalViews').innerText = cardData[0].finalViews.toLocaleString();
-        document.getElementById('finalSpentTarget').innerText = `$${cardData[0].finalSpentTarget.toLocaleString()}`;
-        document.getElementById('finalSpentCompany').innerText = `$${cardData[0].finalSpentCompany.toLocaleString()}`;
-        document.getElementById('finalReqs').innerText = cardData[0].finalReqs.toLocaleString();
-        document.getElementById('finalProcessedReqs').innerText = cardData[0].finalProcessedReqs.toLocaleString();
-        document.getElementById('finalAvaragePriceOfReq').innerText = `$${cardData[0].finalAvaragePriceOfReq.toFixed(2)}`;
-        document.getElementById('finalNumOfMeets').innerText = cardData[0].finalNumOfMeets.toLocaleString();
-        document.getElementById('finalSuccessMeets').innerText = cardData[0].finalSuccessMeets.toLocaleString();
-        document.getElementById('finalAvaragePriceOfMeets').innerText = `$${cardData[0].finalAvaragePriceOfMeets.toFixed(2)}`;
+        document.getElementById('finalViews').innerText = cardData[0].finalViews?.toLocaleString() || '0';
+        document.getElementById('finalSpentTarget').innerText = `$${cardData[0].finalSpentTarget?.toLocaleString() || '0'}`;
+        document.getElementById('finalSpentCompany').innerText = `$${cardData[0].finalSpentCompany?.toLocaleString() || '0'}`;
+        document.getElementById('finalReqs').innerText = cardData[0].finalReqs?.toLocaleString() || '0';
+        document.getElementById('finalProcessedReqs').innerText = cardData[0].finalProcessedReqs?.toLocaleString() || '0';
+        document.getElementById('finalAvaragePriceOfReq').innerText = `$${cardData[0].finalAvaragePriceOfReq?.toFixed(2) || '0.00'}`;
+        document.getElementById('finalNumOfMeets').innerText = cardData[0].finalNumOfMeets?.toLocaleString() || '0';
+        document.getElementById('finalSuccessMeets').innerText = cardData[0].finalSuccessMeets?.toLocaleString() || '0';
+        document.getElementById('finalAvaragePriceOfMeets').innerText = `$${cardData[0].finalAvaragePriceOfMeets?.toFixed(2) || '0.00'}`;
 
-        // Calculate total spent and cost per sale
-        const totalSpent = cardData[0].finalSpentTarget + cardData[0].finalSpentCompany;
+        const totalSpent = (cardData[0].finalSpentTarget || 0) + (cardData[0].finalSpentCompany || 0);
         document.getElementById('totalSpent').innerText = `$${totalSpent.toLocaleString()}`;
 
-        const costPerSale = totalSpent / cardData[0].finalSuccessMeets;
+        const costPerSale = totalSpent / (cardData[0].finalSuccessMeets || 1);
         document.getElementById('costPerSale').innerText = `$${costPerSale.toFixed(2)}`;
 
         document.querySelector('.loader').style.display = 'none';

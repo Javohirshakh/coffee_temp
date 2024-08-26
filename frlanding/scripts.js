@@ -1,4 +1,4 @@
-const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbwh0b5RIwftF9Fph7cX7E0cFOxnNSK78JjxrZtKDiZoA5w-Zse6sPy2G-W4x1L1aj-HWg/exec?route=';
+const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbzeJmNGzBJE5kebDGRDEVIkxETo8toNEHEI5vEDJ164BiQBSNUmz9Dzja_zKVROtS87ug/exec?route=';
 
 const dailyUrl = `${BASE_API_URL}daily`;
 const processedUrl = `${BASE_API_URL}processed`;
@@ -50,24 +50,29 @@ async function createCharts() {
                 })),
                 datasets: [{
                     label: 'Новые заявки',
-                    data: dailyData.map(item => item.newReqs),
+                    data: dailyData.map(item => item.newReqs || 0),
                     backgroundColor: '#26C6DA',
                     stack: 'Stack 0'
                 }, {
-                    label: 'Обработанные заявки',
-                    data: dailyData.map(item => item.processedReqs),
+                    label: 'Квалифицировано',
+                    data: dailyData.map(item => item.qualifiedReqs || 0),
                     backgroundColor: '#66BB6A',
                     stack: 'Stack 1'
                 }, {
-                    label: 'В процессе',
-                    data: dailyData.map(item => item.onProcessReqs),
+                    label: 'Повторные звонки',
+                    data: dailyData.map(item => item.repeatedCalls || 0),
                     backgroundColor: '#FFCA28',
                     stack: 'Stack 2'
                 }, {
-                    label: 'Необработанные заявки',
-                    data: dailyData.map(item => item.notProcessedReqs),
-                    backgroundColor: '#EF5350',
+                    label: 'Клиент не ответил',
+                    data: dailyData.map(item => item.clientNotRespond || 0),
+                    backgroundColor: '#FFA500', // Оранжевый цвет
                     stack: 'Stack 3'
+                }, {
+                    label: 'Необработанные заявки',
+                    data: dailyData.map(item => item.notProcessedReqs || 0),
+                    backgroundColor: '#EF5350',
+                    stack: 'Stack 4'
                 }]
             };
 
@@ -79,7 +84,13 @@ async function createCharts() {
             }
 
             // Calculate the maximum Y-axis value
-            const allDailyValues = dailyData.flatMap(item => [item.newReqs, item.processedReqs, item.onProcessReqs, item.notProcessedReqs]);
+            const allDailyValues = dailyData.flatMap(item => [
+                item.newReqs, 
+                item.qualifiedReqs, 
+                item.repeatedCalls, 
+                item.clientNotRespond, 
+                item.notProcessedReqs
+            ]);
             const maxDailyValue = Math.max(...allDailyValues);
             const yAxisMax = maxDailyValue * 1.2; // Increase by 20%
 
@@ -89,6 +100,22 @@ async function createCharts() {
                 options: {
                     responsive: true,
                     plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                generateLabels: function(chart) {
+                                    const originalLabels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                                    return originalLabels.map(label => {
+                                        if (label.text === 'Клиент не ответил') {
+                                            label.boxWidth = 20;
+                                            label.boxHeight = 20;
+                                        }
+                                        return label;
+                                    });
+                                },
+                                // Настройки легенды
+                            },
+                        },
                         title: {
                             display: true,
                             text: 'Ежедневная статистика за последние 10 дней',
@@ -98,14 +125,14 @@ async function createCharts() {
                         },
                         datalabels: {
                             display: true,
-                            align: 'end',
-                            anchor: 'end',
                             color: 'black',
+                            anchor: 'end',
+                            align: 'top',
                             font: {
-                                weight: 'bold'
+                                weight: 'bold' // Делает текст жирным
                             },
                             formatter: function(value) {
-                                return value.toLocaleString();
+                                return value ? value.toLocaleString() : '';
                             }
                         }
                     },
@@ -118,11 +145,42 @@ async function createCharts() {
                             grid: {
                                 drawOnChartArea: true,
                             },
-                            max: yAxisMax // Set the maximum value for the Y-axis
+                            max: yAxisMax // Установка максимального значения для оси Y
                         }
                     }
                 },
-                plugins: [ChartDataLabels]
+                plugins: [{
+                    id: 'crossInLegend',
+                    afterDraw: (chart) => {
+                        const ctx = chart.ctx;
+                        const legend = chart.legend;
+                        const items = legend.legendItems;
+
+                        items.forEach((item) => {
+                            if (item.text === 'Клиент не ответил') {
+                                const box = legend.legendHitBoxes[items.indexOf(item)];
+                                const x = box.left + 4; // Корректируем позицию по X
+                                const y = box.top + 4; // Корректируем позицию по Y
+
+                                // Рисуем оранжевый прямоугольник
+                                ctx.save();
+                                ctx.fillStyle = '#FFA500';
+                                ctx.fillRect(x, y, 7, 7);
+
+                                // Рисуем белый крестик
+                                ctx.strokeStyle = '#FFFFFF';
+                                ctx.lineWidth = 2;
+                                ctx.beginPath();
+                                ctx.moveTo(x + -3, y + -3);
+                                ctx.lineTo(x + 7, y + 7);
+                                ctx.moveTo(x + 7, y + -3);
+                                ctx.lineTo(x + -3, y + 7);
+                                ctx.stroke();
+                                ctx.restore();
+                            }
+                        });
+                    }
+                }, ChartDataLabels]
             });
         }
 
@@ -155,28 +213,28 @@ async function createCharts() {
                 labels: processedData.map(item => {
                     const report = reportsMap[item.month];
                     if (report) {
-                        return `${item.month}\n$${report.totalSpent.toLocaleString()} - ${report.views.toLocaleString()}`;
+                        return `${item.month}\n$${report.totalSpent?.toLocaleString() || '0'} - ${report.views?.toLocaleString() || '0'}`;
                     }
                     return item.month;
                 }),
                 datasets: [{
                     label: 'Новые заявки',
-                    data: processedData.map(item => item.newReqs),
+                    data: processedData.map(item => item.newReqs || 0),
                     backgroundColor: '#26C6DA',
                     stack: 'Stack 0'
                 }, {
-                    label: 'Обработанные заявки',
-                    data: processedData.map(item => item.processedReqs),
+                    label: 'Квалифицировано',
+                    data: processedData.map(item => item.processedReqs || 0),
                     backgroundColor: '#66BB6A',
                     stack: 'Stack 1'
                 }, {
-                    label: 'В процессе',
-                    data: processedData.map(item => item.onProcess),
+                    label: 'Повторные звонки',
+                    data: processedData.map(item => item.onProcess || 0),
                     backgroundColor: '#FFCA28',
                     stack: 'Stack 2'
                 }, {
                     label: 'Необработанные заявки',
-                    data: processedData.map(item => item.notProcessed),
+                    data: processedData.map(item => item.notProcessed || 0),
                     backgroundColor: '#EF5350',
                     stack: 'Stack 3'
                 }]
@@ -204,14 +262,14 @@ async function createCharts() {
                         },
                         datalabels: {
                             display: true,
-                            align: 'end',
-                            anchor: 'end',
                             color: 'black',
+                            anchor: 'end',
+                            align: 'top',
                             font: {
-                                weight: 'bold'
+                                weight: 'bold' // Делает текст жирным
                             },
                             formatter: function(value) {
-                                return value.toLocaleString();
+                                return value ? value.toLocaleString() : '';
                             }
                         }
                     },
@@ -221,7 +279,7 @@ async function createCharts() {
                             ticks: {
                                 callback: function(value) {
                                     const tick = this.getLabelForValue(value);
-                                    return tick.split('\n'); // Split label for better display
+                                    return tick.split('\n'); // Разделение меток для лучшего отображения
                                 }
                             }
                         },
