@@ -1,14 +1,17 @@
-const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbzeJmNGzBJE5kebDGRDEVIkxETo8toNEHEI5vEDJ164BiQBSNUmz9Dzja_zKVROtS87ug/exec?route=';
+const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbzrt1Zc1hZ4q3Q23XIoVCTZUG4cBdfwQKsFIxhYgQoVCdbe11GxrZ8nKa6XJH7d6bTTBw/exec?route=';
 
 const dailyUrl = `${BASE_API_URL}daily`;
 const processedUrl = `${BASE_API_URL}processed`;
-const reportsUrl = `${BASE_API_URL}reports`;
+const reportsUrl = `${BASE_API_URL}reports`; // Добавлено определение переменной
 const actualDateUrl = `${BASE_API_URL}actual`;
+const meetsUrl = `${BASE_API_URL}meets`;
 
 let dailyChartInstance = null;
 let processedChartInstance = null;
+let meetsChartInstance = null;
 let previousDailyData = null;
 let previousProcessedData = null;
+let previousMeetsData = null;
 
 async function fetchGoogleSheetData(url) {
     const response = await fetch(url);
@@ -20,13 +23,12 @@ async function fetchGoogleSheetData(url) {
 }
 
 function isDataChanged(newData, previousData) {
-    if (!previousData) return true; // Если предыдущих данных нет, значит они изменились
+    if (!previousData) return true;
     return JSON.stringify(newData) !== JSON.stringify(previousData);
 }
 
 async function createCharts() {
     try {
-        // Fetch data for the actual date
         const actualDateData = await fetchGoogleSheetData(actualDateUrl);
         const actualDate = new Date(actualDateData[0].actualDate).toLocaleDateString('ru-RU', {
             year: 'numeric',
@@ -35,12 +37,10 @@ async function createCharts() {
         });
         document.getElementById('actualDate').innerText = actualDate;
 
-        // Fetch data for the daily chart
+        // Daily Chart
         const dailyData = await fetchGoogleSheetData(dailyUrl);
 
-        if (!isDataChanged(dailyData, previousDailyData)) {
-            // console.log('Daily data has not changed, skipping chart update.');
-        } else {
+        if (isDataChanged(dailyData, previousDailyData)) {
             previousDailyData = dailyData;
 
             const dailyChartData = {
@@ -66,7 +66,7 @@ async function createCharts() {
                 }, {
                     label: 'Клиент не ответил',
                     data: dailyData.map(item => item.clientNotRespond || 0),
-                    backgroundColor: '#FFA500', // Оранжевый цвет
+                    backgroundColor: '#FFA500',
                     stack: 'Stack 3'
                 }, {
                     label: 'Необработанные заявки',
@@ -78,12 +78,10 @@ async function createCharts() {
 
             const dailyCtx = document.getElementById('dailyChart').getContext('2d');
 
-            // Уничтожаем старый график, если он существует
             if (dailyChartInstance) {
                 dailyChartInstance.destroy();
             }
 
-            // Calculate the maximum Y-axis value
             const allDailyValues = dailyData.flatMap(item => [
                 item.newReqs, 
                 item.qualifiedReqs, 
@@ -92,7 +90,7 @@ async function createCharts() {
                 item.notProcessedReqs
             ]);
             const maxDailyValue = Math.max(...allDailyValues);
-            const yAxisMax = maxDailyValue * 1.2; // Increase by 20%
+            const yAxisMax = maxDailyValue * 1.2;
 
             dailyChartInstance = new Chart(dailyCtx, {
                 type: 'bar',
@@ -112,9 +110,8 @@ async function createCharts() {
                                         }
                                         return label;
                                     });
-                                },
-                                // Настройки легенды
-                            },
+                                }
+                            }
                         },
                         title: {
                             display: true,
@@ -129,7 +126,7 @@ async function createCharts() {
                             anchor: 'end',
                             align: 'top',
                             font: {
-                                weight: 'bold' // Делает текст жирным
+                                weight: 'bold'
                             },
                             formatter: function(value) {
                                 return value ? value.toLocaleString() : '';
@@ -145,7 +142,7 @@ async function createCharts() {
                             grid: {
                                 drawOnChartArea: true,
                             },
-                            max: yAxisMax // Установка максимального значения для оси Y
+                            max: yAxisMax
                         }
                     }
                 },
@@ -159,22 +156,20 @@ async function createCharts() {
                         items.forEach((item) => {
                             if (item.text === 'Клиент не ответил') {
                                 const box = legend.legendHitBoxes[items.indexOf(item)];
-                                const x = box.left + 4; // Корректируем позицию по X
-                                const y = box.top + 4; // Корректируем позицию по Y
+                                const x = box.left + 4;
+                                const y = box.top + 4;
 
-                                // Рисуем оранжевый прямоугольник
                                 ctx.save();
                                 ctx.fillStyle = '#FFA500';
                                 ctx.fillRect(x, y, 7, 7);
 
-                                // Рисуем белый крестик
                                 ctx.strokeStyle = '#FFFFFF';
                                 ctx.lineWidth = 2;
                                 ctx.beginPath();
-                                ctx.moveTo(x + -3, y + -3);
+                                ctx.moveTo(x - 3, y - 3);
                                 ctx.lineTo(x + 7, y + 7);
-                                ctx.moveTo(x + 7, y + -3);
-                                ctx.lineTo(x + -3, y + 7);
+                                ctx.moveTo(x + 7, y - 3);
+                                ctx.lineTo(x - 3, y + 7);
                                 ctx.stroke();
                                 ctx.restore();
                             }
@@ -184,39 +179,94 @@ async function createCharts() {
             });
         }
 
-        // Fetch data for the processed chart
+        // Meets Chart
+        const meetsData = await fetchGoogleSheetData(meetsUrl);
+
+        if (isDataChanged(meetsData, previousMeetsData)) {
+            previousMeetsData = meetsData;
+
+            const meetsChartData = {
+                labels: meetsData.map(item => new Date(item.date).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'short'
+                })),
+                datasets: [{
+                    label: 'Назначенные встречи',
+                    data: meetsData.map(item => item.appointedMeets || 0),
+                    backgroundColor: '#42A5F5',
+                    stack: 'Stack 0'
+                }, {
+                    label: 'Проведенные встречи',
+                    data: meetsData.map(item => item.heldMeets || 0),
+                    backgroundColor: '#66BB6A',
+                    stack: 'Stack 1'
+                }]
+            };
+
+            const meetsCtx = document.getElementById('meetsChart').getContext('2d');
+
+            if (meetsChartInstance) {
+                meetsChartInstance.destroy();
+            }
+
+            const allMeetsValues = meetsData.flatMap(item => [
+                item.appointedMeets, 
+                item.heldMeets
+            ]);
+            const maxMeetsValue = Math.max(...allMeetsValues);
+            const meetsYAxisMax = maxMeetsValue * 1.2;
+
+            meetsChartInstance = new Chart(meetsCtx, {
+                type: 'bar',
+                data: meetsChartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Встречи за последние 10 дней',
+                            font: {
+                                size: 18,
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: 'black',
+                            anchor: 'end',
+                            align: 'top',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return value ? value.toLocaleString() : '';
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                        },
+                        y: {
+                            display: true,
+                            grid: {
+                                drawOnChartArea: true,
+                            },
+                            max: meetsYAxisMax
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        // Processed Chart
         const processedData = await fetchGoogleSheetData(processedUrl);
 
-        if (!isDataChanged(processedData, previousProcessedData)) {
-            // console.log('Processed data has not changed, skipping chart update.');
-        } else {
+        if (isDataChanged(processedData, previousProcessedData)) {
             previousProcessedData = processedData;
 
-            // Fetch data from the reports route to get total spent and views
-            const reportsData = await fetchGoogleSheetData(reportsUrl);
-
-            // Update the title to show the number of months
-            const numberOfMonths = reportsData.length;
-            document.getElementById('chartTitle').innerText = `ADS reports (последние ${numberOfMonths} месяцев)`;
-
-            // Create a map for easy lookup of views and total spent by month
-            const reportsMap = reportsData.reduce((map, item) => {
-                const totalSpent = item.amountSpentTarget + item.amountSpentCompany;
-                map[item.month] = {
-                    totalSpent,
-                    views: item.viewsPerMonth
-                };
-                return map;
-            }, {});
-
             const processedChartData = {
-                labels: processedData.map(item => {
-                    const report = reportsMap[item.month];
-                    if (report) {
-                        return `${item.month}\n$${report.totalSpent?.toLocaleString() || '0'} - ${report.views?.toLocaleString() || '0'}`;
-                    }
-                    return item.month;
-                }),
+                labels: processedData.map(item => item.month),
                 datasets: [{
                     label: 'Новые заявки',
                     data: processedData.map(item => item.newReqs || 0),
@@ -242,7 +292,6 @@ async function createCharts() {
 
             const processedCtx = document.getElementById('processedChart').getContext('2d');
 
-            // Уничтожаем старый график, если он существует
             if (processedChartInstance) {
                 processedChartInstance.destroy();
             }
@@ -266,7 +315,7 @@ async function createCharts() {
                             anchor: 'end',
                             align: 'top',
                             font: {
-                                weight: 'bold' // Делает текст жирным
+                                weight: 'bold'
                             },
                             formatter: function(value) {
                                 return value ? value.toLocaleString() : '';
@@ -279,7 +328,7 @@ async function createCharts() {
                             ticks: {
                                 callback: function(value) {
                                     const tick = this.getLabelForValue(value);
-                                    return tick.split('\n'); // Разделение меток для лучшего отображения
+                                    return tick.split('\n');
                                 }
                             }
                         },

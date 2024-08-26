@@ -1,14 +1,17 @@
-const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbzeJmNGzBJE5kebDGRDEVIkxETo8toNEHEI5vEDJ164BiQBSNUmz9Dzja_zKVROtS87ug/exec?route=';
+const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbzrt1Zc1hZ4q3Q23XIoVCTZUG4cBdfwQKsFIxhYgQoVCdbe11GxrZ8nKa6XJH7d6bTTBw/exec';
 
-const chart1Url = `${BASE_API_URL}reports`;
-const chart2Url = `${BASE_API_URL}requests`;
-const chart3Url = `${BASE_API_URL}processed`;
-const cardsUrl = `${BASE_API_URL}cards`;
-const actualDateUrl = `${BASE_API_URL}actual`;
-const dailyUrl = `${BASE_API_URL}daily`;
+const chart1Url = `${BASE_API_URL}?route=reports`;
+const chart2Url = `${BASE_API_URL}?route=requests`;
+const chart3Url = `${BASE_API_URL}?route=processed`;
+const cardsUrl = `${BASE_API_URL}?route=cards`;
+const actualDateUrl = `${BASE_API_URL}?route=actual`;
+const dailyUrl = `${BASE_API_URL}?route=daily`;
+const meetsUrl = `${BASE_API_URL}?route=meets`; // Новый URL для данных встреч
 
 let dailyChartInstance = null;
+let meetsChartInstance = null;
 let previousDailyData = null;
+let previousMeetsData = null;
 
 async function fetchGoogleSheetData(url) {
     const response = await fetch(url);
@@ -125,7 +128,7 @@ async function createCharts() {
 
         // Daily Chart
         const dailyData = await fetchGoogleSheetData(dailyUrl);
-        // console.log("Daily Data:", dailyData); // Логирование данных для проверки
+        console.log("Daily Data:", dailyData); // Логирование данных для проверки
 
         if (isDataChanged(dailyData, previousDailyData)) {
             previousDailyData = dailyData;
@@ -165,12 +168,10 @@ async function createCharts() {
 
             const dailyCtx = document.getElementById('dailyChart').getContext('2d');
 
-            // Уничтожаем старый график, если он существует
             if (dailyChartInstance) {
                 dailyChartInstance.destroy();
             }
 
-            // Calculate the maximum Y-axis value
             const allDailyValues = dailyData.flatMap(item => [
                 item.newReqs, 
                 item.qualifiedReqs, 
@@ -179,7 +180,7 @@ async function createCharts() {
                 item.notProcessedReqs
             ]);
             const maxDailyValue = Math.max(...allDailyValues);
-            const yAxisMax = maxDailyValue * 1.2; // Increase by 20%
+            const yAxisMax = maxDailyValue * 1.2;
 
             dailyChartInstance = new Chart(dailyCtx, {
                 type: 'bar',
@@ -266,8 +267,84 @@ async function createCharts() {
                     }
                 }, ChartDataLabels]
             });
+        }
 
-            // console.log("Daily Chart Instance:", dailyChartInstance); // Логирование объекта диаграммы
+        // Meets Chart
+        const meetsData = await fetchGoogleSheetData(meetsUrl);
+        console.log("Meets Data:", meetsData); // Логирование данных для проверки
+
+        if (isDataChanged(meetsData, previousMeetsData)) {
+            previousMeetsData = meetsData;
+
+            const meetsChartData = {
+                labels: meetsData.map(item => new Date(item.date).toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'short'
+                })),
+                datasets: [{
+                    label: 'Назначенные встречи',
+                    data: meetsData.map(item => item.appointedMeets || 0),
+                    backgroundColor: '#42A5F5',
+                    stack: 'Stack 0'
+                }, {
+                    label: 'Проведенные встречи',
+                    data: meetsData.map(item => item.heldMeets || 0),
+                    backgroundColor: '#66BB6A',
+                    stack: 'Stack 1'
+                }]
+            };
+
+            const meetsCtx = document.getElementById('meetsChart').getContext('2d');
+
+            if (meetsChartInstance) {
+                meetsChartInstance.destroy();
+            }
+
+            const allMeetsValues = meetsData.flatMap(item => [item.appointedMeets, item.heldMeets]);
+            const maxMeetsValue = Math.max(...allMeetsValues);
+            const yAxisMaxMeets = maxMeetsValue * 1.2;
+
+            meetsChartInstance = new Chart(meetsCtx, {
+                type: 'bar',
+                data: meetsChartData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Встречи за последние 10 дней',
+                            font: {
+                                size: 18,
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: 'black',
+                            anchor: 'end',
+                            align: 'top',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return value ? value.toLocaleString() : '';
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                        },
+                        y: {
+                            display: true,
+                            grid: {
+                                drawOnChartArea: true,
+                            },
+                            max: yAxisMaxMeets
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
         }
 
         // Chart 3
