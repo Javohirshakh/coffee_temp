@@ -66,7 +66,7 @@ async function createCharts() {
                 }, {
                     label: 'Клиент не ответил',
                     data: dailyData.map(item => item.clientNotRespond || 0),
-                    backgroundColor: '#FFA500',
+                    backgroundColor: '#8000FF',
                     stack: 'Stack 3'
                 }, {
                     label: 'Необработанные заявки',
@@ -160,7 +160,7 @@ async function createCharts() {
                                 const y = box.top + 4;
 
                                 ctx.save();
-                                ctx.fillStyle = '#FFA500';
+                                ctx.fillStyle = '#8000FF';
                                 ctx.fillRect(x, y, 7, 7);
 
                                 ctx.strokeStyle = '#FFFFFF';
