@@ -1,4 +1,4 @@
-const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbzrt1Zc1hZ4q3Q23XIoVCTZUG4cBdfwQKsFIxhYgQoVCdbe11GxrZ8nKa6XJH7d6bTTBw/exec';
+const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbx-2_4hc6KdHd-0tGYgzNRzHQMJ6TKObWoV8inUWQwYmTtqTD7H30iGuFrbjmK4ivzrlQ/exec';
 
 const chart1Url = `${BASE_API_URL}?route=reports`;
 const chart2Url = `${BASE_API_URL}?route=requests`;
@@ -7,6 +7,7 @@ const cardsUrl = `${BASE_API_URL}?route=cards`;
 const actualDateUrl = `${BASE_API_URL}?route=actual`;
 const dailyUrl = `${BASE_API_URL}?route=daily`;
 const meetsUrl = `${BASE_API_URL}?route=meets`; // Новый URL для данных встреч
+const salesUrl = `${BASE_API_URL}?route=sales`; // Новый URL для данных продаж
 
 let dailyChartInstance = null;
 let meetsChartInstance = null;
@@ -43,10 +44,10 @@ async function createCharts() {
         document.getElementById('chartTitle').innerText = `ADS reports (последние ${numberOfMonths} месяцев)`;
 
         const chart1Data = {
-            labels: data1.map(item => `${item.month}\n(1 заявка - $${item.requestPrice?.toFixed(2) || 0})`),
+            labels: data1.map(item => `${item.month}\n(1 заявка - $${(item.requestPrice?.toFixed(2) || 0)})`),
             datasets: [{
                 label: 'Просмотры в месяц',
-                data: data1.map(item => item.viewsPerMonth / 1000),
+                data: data1.map(item => (item.viewsPerMonth || 0) / 1000),
                 backgroundColor: '#42A5F5',
                 stack: 'Stack 0'
             }, {
@@ -101,7 +102,7 @@ async function createCharts() {
                             if (context.dataset.label.includes('Потраченная сумма')) {
                                 return `$${value.toLocaleString()}`;
                             }
-                            return value?.toLocaleString() || '';
+                            return value?.toLocaleString() || '0';
                         }
                     }
                 },
@@ -173,11 +174,11 @@ async function createCharts() {
             }
 
             const allDailyValues = dailyData.flatMap(item => [
-                item.newReqs, 
-                item.qualifiedReqs, 
-                item.repeatedCalls, 
-                item.clientNotRespond, 
-                item.notProcessedReqs
+                item.newReqs || 0, 
+                item.qualifiedReqs || 0, 
+                item.repeatedCalls || 0, 
+                item.clientNotRespond || 0, 
+                item.notProcessedReqs || 0
             ]);
             const maxDailyValue = Math.max(...allDailyValues);
             const yAxisMax = maxDailyValue * 1.2;
@@ -219,7 +220,7 @@ async function createCharts() {
                                 weight: 'bold'
                             },
                             formatter: function(value) {
-                                return value ? value.toLocaleString() : '';
+                                return value ? value.toLocaleString() : '0';
                             }
                         }
                     },
@@ -300,7 +301,7 @@ async function createCharts() {
                 meetsChartInstance.destroy();
             }
 
-            const allMeetsValues = meetsData.flatMap(item => [item.appointedMeets, item.heldMeets]);
+            const allMeetsValues = meetsData.flatMap(item => [item.appointedMeets || 0, item.heldMeets || 0]);
             const maxMeetsValue = Math.max(...allMeetsValues);
             const yAxisMaxMeets = maxMeetsValue * 1.2;
 
@@ -326,7 +327,7 @@ async function createCharts() {
                                 weight: 'bold'
                             },
                             formatter: function(value) {
-                                return value ? value.toLocaleString() : '';
+                                return value ? value.toLocaleString() : '0';
                             }
                         }
                     },
@@ -397,7 +398,7 @@ async function createCharts() {
                             weight: 'bold'
                         },
                         formatter: function(value) {
-                            return value?.toLocaleString() || '';
+                            return value?.toLocaleString() || '0';
                         }
                     }
                 },
@@ -477,6 +478,71 @@ async function createCharts() {
             plugins: [ChartDataLabels]
         });
 
+        // Sales Chart
+        const salesData = await fetchGoogleSheetData(salesUrl);
+        console.log("Sales Data:", salesData); // Логирование данных для проверки
+
+        const salesChartData = {
+            labels: salesData.map(item => {
+                const salesText = item.sales ? `<br>Продажы: ${item.sales}` : '';
+                return `${item.month}${salesText}`;
+            }),
+            datasets: [{
+                label: 'Потраченная сумма',
+                data: salesData.map(item => item.amonutSpent || 0),
+                backgroundColor: '#42A5F5',
+                stack: 'Stack 0'
+            }]
+        };
+
+        const salesCtx = document.getElementById('salesChart').getContext('2d');
+        new Chart(salesCtx, {
+            type: 'bar',
+            data: salesChartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Потраченная сумма и продажи по месяцам',
+                        font: {
+                            size: 18,
+                        }
+                    },
+                    datalabels: {
+                        display: true,
+                        color: 'black',
+                        anchor: 'end',
+                        align: 'top',
+                        font: {
+                            weight: 'bold'
+                        },
+                        formatter: function(value) {
+                            return `$${value?.toLocaleString() || '0'}`;
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        ticks: {
+                            callback: function(value) {
+                                const tick = this.getLabelForValue(value);
+                                return tick.split('<br>');
+                            }
+                        }
+                    },
+                    y: {
+                        display: true,
+                        grid: {
+                            drawOnChartArea: true,
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
         // Cards
         const cardData = await fetchGoogleSheetData(cardsUrl);
 
@@ -493,7 +559,8 @@ async function createCharts() {
         const totalSpent = (cardData[0].finalSpentTarget || 0) + (cardData[0].finalSpentCompany || 0);
         document.getElementById('totalSpent').innerText = `$${totalSpent.toLocaleString()}`;
 
-        const costPerSale = totalSpent / (cardData[0].finalSuccessMeets || 1);
+        // Обновление карточки с "Суммой одной продажи"
+        const costPerSale = salesData[salesData.length - 1].amonutSpent / (cardData[0].finalSuccessMeets || 1);
         document.getElementById('costPerSale').innerText = `$${costPerSale.toFixed(2)}`;
 
         document.querySelector('.loader').style.display = 'none';

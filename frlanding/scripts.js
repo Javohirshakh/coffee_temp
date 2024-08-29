@@ -1,4 +1,4 @@
-const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbzrt1Zc1hZ4q3Q23XIoVCTZUG4cBdfwQKsFIxhYgQoVCdbe11GxrZ8nKa6XJH7d6bTTBw/exec?route=';
+const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbx-2_4hc6KdHd-0tGYgzNRzHQMJ6TKObWoV8inUWQwYmTtqTD7H30iGuFrbjmK4ivzrlQ/exec?route=';
 
 const dailyUrl = `${BASE_API_URL}daily`;
 const processedUrl = `${BASE_API_URL}processed`;
@@ -83,11 +83,11 @@ async function createCharts() {
             }
 
             const allDailyValues = dailyData.flatMap(item => [
-                item.newReqs, 
-                item.qualifiedReqs, 
-                item.repeatedCalls, 
-                item.clientNotRespond, 
-                item.notProcessedReqs
+                item.newReqs || 0, 
+                item.qualifiedReqs || 0, 
+                item.repeatedCalls || 0, 
+                item.clientNotRespond || 0, 
+                item.notProcessedReqs || 0
             ]);
             const maxDailyValue = Math.max(...allDailyValues);
             const yAxisMax = maxDailyValue * 1.2;
@@ -129,7 +129,7 @@ async function createCharts() {
                                 weight: 'bold'
                             },
                             formatter: function(value) {
-                                return value ? value.toLocaleString() : '';
+                                return value ? value.toLocaleString() : '0';
                             }
                         }
                     },
@@ -210,8 +210,8 @@ async function createCharts() {
             }
 
             const allMeetsValues = meetsData.flatMap(item => [
-                item.appointedMeets, 
-                item.heldMeets
+                item.appointedMeets || 0, 
+                item.heldMeets || 0
             ]);
             const maxMeetsValue = Math.max(...allMeetsValues);
             const meetsYAxisMax = maxMeetsValue * 1.2;
@@ -238,7 +238,7 @@ async function createCharts() {
                                 weight: 'bold'
                             },
                             formatter: function(value) {
-                                return value ? value.toLocaleString() : '';
+                                return value ? value.toLocaleString() : '0';
                             }
                         }
                     },
@@ -318,7 +318,7 @@ async function createCharts() {
                                 weight: 'bold'
                             },
                             formatter: function(value) {
-                                return value ? value.toLocaleString() : '';
+                                return value ? value.toLocaleString() : '0';
                             }
                         }
                     },
