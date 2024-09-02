@@ -484,7 +484,7 @@ async function createCharts() {
 
         const salesChartData = {
             labels: salesData.map(item => {
-                const salesText = item.sales ? `<br>Продажы: ${item.sales}` : '';
+                const salesText = item.sales ? `<br>Продажи: ${item.sales}` : '';
                 return `${item.month}${salesText}`;
             }),
             datasets: [{
