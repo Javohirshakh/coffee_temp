@@ -26,7 +26,7 @@ function updateHeader(dates) {
     const firstDate = dates[0];
     const lastDate = dates[dates.length - 1];
     const headerTitle = document.getElementById('header-title');
-    headerTitle.textContent = `Apexpizza Kuryerlar Statistikasi (oxirgi 7 kun: ${firstDate} - ${lastDate})`;
+    headerTitle.textContent = `Apexpizza Oshpazlar Statistikasi (oxirgi 7 kun: ${firstDate} - ${lastDate})`;
 }
 
 async function updateData() {
@@ -195,21 +195,21 @@ async function updateData() {
                 labels: dates,
                 datasets: [
                     {
-                        label: 'Vaqtida yetkazib berilgan',
+                        label: 'Vaqtida tayyor bo\'lgan',
                         data: onTimeDeliveries,
                         backgroundColor: 'rgba(34, 139, 34, 0.8)',
                         borderColor: 'rgba(34, 139, 34, 1)',
                         borderWidth: 1
                     },
                     {
-                        label: 'Kechikib yetkazib berilgan',
+                        label: 'Kech tayyor bo\'lgan',
                         data: lateDeliveries,
                         backgroundColor: 'rgba(255, 0, 0, 0.8)',
                         borderColor: 'rgba(220, 20, 60, 1)',
                         borderWidth: 1
                     },
                     {
-                        label: 'Oʻrtacha yetkazib berish vaqti',
+                        label: 'Oʻrtacha tayyorlanish vaqti',
                         data: avgDeliveryTime,
                         backgroundColor: 'rgba(75, 192, 192, 0.8)',
                         borderColor: 'rgba(75, 192, 192, 1)',
