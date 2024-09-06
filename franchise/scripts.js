@@ -1,4 +1,4 @@
-const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbx-2_4hc6KdHd-0tGYgzNRzHQMJ6TKObWoV8inUWQwYmTtqTD7H30iGuFrbjmK4ivzrlQ/exec';
+const BASE_API_URL = 'https://script.google.com/macros/s/AKfycby-Fnt1tiOaZ7WOR23RJYFTaQrdCnwLPCyEya-TyBxGC0oNJgfACGUMIM4Ma3L8QlpnZg/exec';
 
 const chart1Url = `${BASE_API_URL}?route=reports`;
 const chart2Url = `${BASE_API_URL}?route=requests`;
@@ -292,6 +292,11 @@ async function createCharts() {
                     data: meetsData.map(item => item.heldMeets || 0),
                     backgroundColor: '#66BB6A',
                     stack: 'Stack 1'
+                }, {
+                    label: 'Готовы к встрече',
+                    data: meetsData.map(item => item.readyForMeets || 0),
+                    backgroundColor: '#FF5733',
+                    stack: 'Stack 2'
                 }]
             };
 
@@ -301,7 +306,7 @@ async function createCharts() {
                 meetsChartInstance.destroy();
             }
 
-            const allMeetsValues = meetsData.flatMap(item => [item.appointedMeets || 0, item.heldMeets || 0]);
+            const allMeetsValues = meetsData.flatMap(item => [item.appointedMeets || 0, item.heldMeets || 0, item.readyForMeets || 0]);
             const maxMeetsValue = Math.max(...allMeetsValues);
             const yAxisMaxMeets = maxMeetsValue * 1.2;
 
@@ -420,7 +425,7 @@ async function createCharts() {
         // Chart 2
         const data2 = await fetchGoogleSheetData(chart2Url);
         const chart2Data = {
-            labels: data2.map(item => `${item.month}\nКоличество встреч: ${item.numOfMeets || 0}`),
+            labels: data2.map(item => `${item.month}\nВстречи: ${item.numOfMeets || 0}`),
             datasets: [{
                 label: 'Средняя стоимость встречи',
                 data: data2.map(item => item.avarageReq || 0),

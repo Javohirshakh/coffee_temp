@@ -25,7 +25,7 @@ async function updateCards() {
                 reverse: false
             },
             {
-                title: 'O\'rtacha kutish vaqti',
+                title: 'O\'rtacha tayyorlanish vaqti',
                 value: `${data.averageDeliveryTime.toFixed(1)} min`,
                 previous: `${data.pwAverageDeliveryTime.toFixed(1)} min`,
                 improvement: data.averageDeliveryTime <= data.pwAverageDeliveryTime,

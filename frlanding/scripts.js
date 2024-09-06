@@ -1,4 +1,4 @@
-const BASE_API_URL = 'https://script.google.com/macros/s/AKfycbx-2_4hc6KdHd-0tGYgzNRzHQMJ6TKObWoV8inUWQwYmTtqTD7H30iGuFrbjmK4ivzrlQ/exec?route=';
+const BASE_API_URL = 'https://script.google.com/macros/s/AKfycby-Fnt1tiOaZ7WOR23RJYFTaQrdCnwLPCyEya-TyBxGC0oNJgfACGUMIM4Ma3L8QlpnZg/exec?route=';
 
 const dailyUrl = `${BASE_API_URL}daily`;
 const processedUrl = `${BASE_API_URL}processed`;
@@ -200,6 +200,11 @@ async function createCharts() {
                     data: meetsData.map(item => item.heldMeets || 0),
                     backgroundColor: '#66BB6A',
                     stack: 'Stack 1'
+                }, {
+                    label: 'Готовы к встрече',
+                    data: meetsData.map(item => item.readyForMeets || 0),
+                    backgroundColor: '#FF5733',
+                    stack: 'Stack 2'
                 }]
             };
 
@@ -209,10 +214,8 @@ async function createCharts() {
                 meetsChartInstance.destroy();
             }
 
-            const allMeetsValues = meetsData.flatMap(item => [
-                item.appointedMeets || 0, 
-                item.heldMeets || 0
-            ]);
+            const allMeetsValues = meetsData.flatMap(item => [item.appointedMeets || 0, item.heldMeets || 0, item.readyForMeets || 0]);
+
             const maxMeetsValue = Math.max(...allMeetsValues);
             const meetsYAxisMax = maxMeetsValue * 1.2;
 
