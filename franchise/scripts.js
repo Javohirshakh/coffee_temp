@@ -565,7 +565,7 @@ async function createCharts() {
         document.getElementById('totalSpent').innerText = `$${totalSpent.toLocaleString()}`;
 
         // Обновление карточки с "Суммой одной продажи"
-        const costPerSale = salesData[salesData.length - 1].amonutSpent / (cardData[0].finalSuccessMeets || 1);
+        const costPerSale = salesData[salesData.length - 1].amonutSpent;
         document.getElementById('costPerSale').innerText = `~ $${costPerSale.toFixed(2)}`;
 
         document.querySelector('.loader').style.display = 'none';
